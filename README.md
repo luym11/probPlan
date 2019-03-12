@@ -9,7 +9,13 @@ Our goal is to reach the target as soon as possible with a safest path to preven
 ### DP satisfaction
 Set up an automaton specification satisfication problem, solve it with dynamic programming. The optimal path will be evaluated using Monte Carlo evaluation function at the last part of the solver. 
 
+### Graph search using evaluation function
+Simply apply any graph search algorithm but use self-developed Monte Carlo evaluation function for the cost of the path. Note that this evaluation function needs to be 
+- addable
+- transformed to be something for minimization with a lower bound
+
 ## Components
+
 ### Problem setting
 Basic setting class of the problem. 
 Use as `p1 = problem_setting.ProblemSetting(args)`
@@ -48,3 +54,6 @@ This class is inherited from `ProblemSetting()`, results will be:
 
 Only solve the problem using DP method. 
 
+### maxProbAstar.py
+
+Solve the problem using A*(h=0) with path evaluation as "cost"
