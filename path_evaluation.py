@@ -52,11 +52,8 @@ class PathEvaluation(object):
     def is_path_safe_in_episode(self, path, episodeFireMap):
         T = len(path)-1
         for t in range(1,T):
-            try:
-                if(not self.is_path_safe_at_t(path[t], episodeFireMap[t])):
-                    return False
-            except:
-                print(path)
+            if(not self.is_path_safe_at_t(path[t], episodeFireMap[t])):
+                return False
         return True
 
     def is_path_safe_at_t(self, tPath, tFireMap):
