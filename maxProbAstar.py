@@ -7,7 +7,6 @@ from path_evaluation import PathEvaluation
 import numpy as np
 import time
 
-_INF = 10000
 
 class MaxProbAstar(AStar):
     def __init__(self, p):
@@ -28,7 +27,7 @@ class MaxProbAstar(AStar):
         p1 = self.pe.evaluate_path(pathToN1)
         p2 = self.pe.evaluate_path(pathToN2)
         if p2 == 0 or p1 == 0:
-            return _INF
+            return float('inf')
         # print('try moving from (%d,%d) to (%d,%d)' %(self.searchNodes[n1].data[0],self.searchNodes[n1].data[1],self.searchNodes[n2].data[0],self.searchNodes[n2].data[1]))
         # print('path to be: ')
         # print(pathToN1)
@@ -58,4 +57,6 @@ if __name__ == '__main__':
     _path, searchNodes, lastNode = MaxProbAstar(p1).astar((8,0),(12,16))
     path = list(_path)
     elapsed_ = time.time() - _t
-    print('Computation took: %d seconds' %(elapsed_)) 
+    pe=PathEvaluation(monteCarloFireMap)
+    pr=pe.evaluate_path(path)
+    print('Prob is %f, Computation took: %d seconds' %(pr, elapsed_)) 

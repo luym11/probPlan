@@ -50,7 +50,7 @@ class PathEvaluation(object):
         return safeProb
 
     def is_path_safe_in_episode(self, path, episodeFireMap):
-        T = len(path)-1
+        T = len(path)
         for t in range(1,T):
             if(not self.is_path_safe_at_t(path[t], episodeFireMap[t])):
                 return False
