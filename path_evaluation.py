@@ -7,7 +7,8 @@ class PathEvaluation(object):
 
     def __init__(self, monteCarloFireMap):
         self.monteCarloHorizon = len(monteCarloFireMap)
-        self.monteCarloFireMapArray = np.array(monteCarloFireMap)
+        self.monteCarloFireMap = monteCarloFireMap
+        #self.monteCarloFireMapArray = np.array(monteCarloFireMap)
 
     def evaluate_path(self, path):
         # note this path must be from initial point. For Monte Carlo methods, the best way is
@@ -44,7 +45,7 @@ class PathEvaluation(object):
         # monteCarloFireMapArray[h][t] is h episode at time=t
         positiveCounter = 0
         for h in range(self.monteCarloHorizon): # every episode
-            if(self.is_path_safe_in_episode(path, self.monteCarloFireMapArray[h])):
+            if(self.is_path_safe_in_episode(path, self.monteCarloFireMap[h])):
                 positiveCounter += 1
         safeProb = positiveCounter/self.monteCarloHorizon
         return safeProb
@@ -57,6 +58,6 @@ class PathEvaluation(object):
         return True
 
     def is_path_safe_at_t(self, tPath, tFireMap):
-        if(tFireMap[tPath[0],tPath[1]] > 0.9):
+        if(tFireMap[tPath[0]][tPath[1]] > 0.9):
             return False
         return True
