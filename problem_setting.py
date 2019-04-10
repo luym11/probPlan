@@ -169,7 +169,7 @@ class ProblemSetting():
             np.savetxt('./monteCarloAverage/monteCarloAverageFireMap'+str(k)+'.txt', firemap_sum[k])
         return firemap_sum
 
-    def __init__(self, target = [[12,16]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[10,18]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -225,7 +225,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 2000
+        self.monteCarloHorizon = 3000
 
         if(_setting_num == 0):
             self.M = 4
