@@ -9,7 +9,7 @@ import time
 
 
 class MaxProbAstar(AStar):
-    def __init__(self, p):
+    def __init__(self, p, monteCarloFireMap):
         # p is the problem
         self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
         self.M = p.M
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         for k in range(len(p1.FireMap)):
             monteCarloFireMap[h][k] = np.loadtxt('./monteCarlo/monteCarloFireMapTrial'+str(h)+'/monteCarloFireMapAt'+str(k)+'.txt')
     _t = time.time()
-    _path, searchNodes, lastNode = MaxProbAstar(p1).astar((8,0),(10,18))
+    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap).astar((8,0),(10,18))
     path = list(_path)
     elapsed_ = time.time() - _t
     pe=PathEvaluation(monteCarloFireMap)

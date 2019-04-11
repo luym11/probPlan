@@ -169,6 +169,17 @@ class ProblemSetting():
             np.savetxt('./monteCarloAverage/monteCarloAverageFireMap'+str(k)+'.txt', firemap_sum[k])
         return firemap_sum
 
+    def compute_monteCarlo_2(self, _GenerateHorizon):
+        # Do as compute_monteCarlo but not saving
+        # Time horizon fixed to be len(self.FireMap)
+        monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
+        for h in range(_GenerateHorizon):
+            monteCarloFireMap[h] = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            # new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            # for k in range(len(firemap_sum)):
+            #     monteCarloFireMap[h][k] =  new_firemap[k]
+        return monteCarloFireMap
+
     def __init__(self, target = [[10,18]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
@@ -225,7 +236,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 3000
+        self.monteCarloHorizon = 1000
 
         if(_setting_num == 0):
             self.M = 4
