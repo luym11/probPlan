@@ -41,9 +41,7 @@ class OnlineMaxProbAstar():
             try:
                 _path, searchNodes, lastNode = MaxProbAstar(self.p, monteCarloFireMap).astar(start, target)
             except:
-                print('Problem arisesssssssssssssssssssssssssssssssss')
-                print(start)
-                print(target)
+                print('No feasible path found!')
             path = list(_path)
             pe=PathEvaluation(monteCarloFireMap)
             pr=pe.evaluate_path(path)
@@ -66,8 +64,8 @@ class OnlineMaxProbAstar():
         return executed_path
     
 if __name__ == '__main__':
-    s = sys.argv[1]
-    onlineMPA = OnlineMaxProbAstar(step_size=int(float(s)), start = (8,0), target = (10,18))
+    #s = sys.argv[1]v#int(float(s))
+    onlineMPA = OnlineMaxProbAstar(step_size=1, start = (8,0), target = (10,18))
     _t = time.time()
     executed_path = onlineMPA.execution()
     elapsed_ = time.time() - _t
@@ -81,4 +79,9 @@ if __name__ == '__main__':
     print(executed_path)
     print('probs')
     print(onlineMPA.probs)
+    pe=PathEvaluation([onlineMPA.p.FireMap])
+    pr1=pe.evaluate_path(onlineMPA.paths[0])
+    pr2=pe.evaluate_path(executed_path)
+    print(pr1)
+    print(pr2)
     print()
