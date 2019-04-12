@@ -21,8 +21,9 @@ class OnlineMaxProbAstar():
         self.start = start
         self.target = target
 
-        self.probs = []
         self.paths = []
+
+        self.badFlag = False
 
     def generateMonteCarloMap(self, currentFireMap):
         # maybe don't need to save files, just generate
@@ -41,34 +42,33 @@ class OnlineMaxProbAstar():
             try:
                 _path, searchNodes, lastNode = MaxProbAstar(self.p, monteCarloFireMap).astar(start, target)
             except:
+                # print(start)
+                # print(self.p.FireMap[i][start[0]][start[1]])
+                # print(np.array(self.p.FireMap[i]))
                 print('No feasible path found!')
+                self.badFlag = True
+                break
             path = list(_path)
-            pe=PathEvaluation(monteCarloFireMap)
-            pr=pe.evaluate_path(path)
             # appending stuff
             self.paths.append(path)
-            self.probs.append(pr)
-            if len(path) > self.step_size+1 and (target not in path[1:1+self.step_size]):
+            assert (len(path) > 1),path
+            if len(path) > self.step_size+1:
                 executed_path.extend(path[1:1+self.step_size]) # add these new steps to actually executed path
-                print('Prob is %f from step %d' %(pr, i))
                 # update
                 start = path[self.step_size]
                 i += self.step_size
-            elif len(path) != 1:
-                executed_path.extend(path[1:])
-                print('Prob is %f from step %d to the end' %(pr, i))
-                break
             else:
-                print('Prob is %f from step %d to the end' %(pr, i))
+                executed_path.extend(path[1:])
                 break
         return executed_path
     
 if __name__ == '__main__':
-    #s = sys.argv[1]v#int(float(s))
-    onlineMPA = OnlineMaxProbAstar(step_size=1, start = (8,0), target = (10,18))
+    s = sys.argv[1]
+    onlineMPA = OnlineMaxProbAstar(step_size=int(float(s)), start = (8,0), target = (10,16))
     _t = time.time()
     executed_path = onlineMPA.execution()
     elapsed_ = time.time() - _t
+    # if(not onlineMPA.badFlag):
     print('step size')
     print(onlineMPA.step_size)
     print('time execution')
@@ -77,8 +77,6 @@ if __name__ == '__main__':
     print(onlineMPA.paths[0])
     print('executed path')
     print(executed_path)
-    print('probs')
-    print(onlineMPA.probs)
     pe=PathEvaluation([onlineMPA.p.FireMap])
     pr1=pe.evaluate_path(onlineMPA.paths[0])
     pr2=pe.evaluate_path(executed_path)

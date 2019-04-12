@@ -174,13 +174,13 @@ class ProblemSetting():
         # Time horizon fixed to be len(self.FireMap)
         monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
         for h in range(_GenerateHorizon):
-            monteCarloFireMap[h] = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
-            # new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
-            # for k in range(len(firemap_sum)):
-            #     monteCarloFireMap[h][k] =  new_firemap[k]
+            # monteCarloFireMap[h] = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            for k in range(len(self.FireMap)):
+                monteCarloFireMap[h][k] =  new_firemap[k]
         return monteCarloFireMap
 
-    def __init__(self, target = [[10,18]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[10,16]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -236,7 +236,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 1000
+        self.monteCarloHorizon = 100
 
         if(_setting_num == 0):
             self.M = 4
@@ -257,6 +257,6 @@ class ProblemSetting():
         # Test if fire is spreaded expectedly
         # self.plot_fire(self.FireMap[49])
 
-    def __del__(self):
-        class_name = self.__class__.__name__
-        print(class_name, 'problem_settings_destroyed')
+    # def __del__(self):
+    #     class_name = self.__class__.__name__
+    #     print(class_name, 'problem_settings_destroyed')
