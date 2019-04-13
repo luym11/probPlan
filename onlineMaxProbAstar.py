@@ -4,6 +4,7 @@ import time
 import os
 import math
 import sys
+import multiprocessing as mp
 
 import problem_setting
 from maxProbAstar import MaxProbAstar
@@ -61,25 +62,36 @@ class OnlineMaxProbAstar():
                 executed_path.extend(path[1:])
                 break
         return executed_path
-    
-if __name__ == '__main__':
-    s = sys.argv[1]
-    onlineMPA = OnlineMaxProbAstar(step_size=int(float(s)), start = (8,0), target = (10,16))
-    _t = time.time()
+
+def multi_process_task(s):
+    onlineMPA = OnlineMaxProbAstar(step_size=s, start = (8,0), target = (10,16))
     executed_path = onlineMPA.execution()
-    elapsed_ = time.time() - _t
-    # if(not onlineMPA.badFlag):
-    print('step size')
-    print(onlineMPA.step_size)
-    print('time execution')
-    print(elapsed_)
-    print('original path')
-    print(onlineMPA.paths[0])
-    print('executed path')
-    print(executed_path)
+    flag = onlineMPA.badFlag
     pe=PathEvaluation([onlineMPA.p.FireMap])
     pr1=pe.evaluate_path(onlineMPA.paths[0])
     pr2=pe.evaluate_path(executed_path)
-    print(pr1)
-    print(pr2)
-    print()
+    return flag,pr1,pr2
+if __name__ == '__main__':
+    # s = sys.argv[1]
+    # onlineMPA = OnlineMaxProbAstar(step_size=int(float(s)), start = (8,0), target = (10,16))
+    # _t = time.time()
+    # executed_path = onlineMPA.execution()
+    # elapsed_ = time.time() - _t
+    # # if(not onlineMPA.badFlag):
+    # print('step size')
+    # print(onlineMPA.step_size)
+    # print('time execution')
+    # print(elapsed_)
+    # print('original path')
+    # print(onlineMPA.paths[0])
+    # print('executed path')
+    # print(executed_path)
+    # pe=PathEvaluation([onlineMPA.p.FireMap])
+    # pr1=pe.evaluate_path(onlineMPA.paths[0])
+    # pr2=pe.evaluate_path(executed_path)
+    # print(pr1)
+    # print(pr2)
+    # print()
+    pool = mp.Pool(processes=10)
+    results = [pool.apply(multi_process_task,args=(1,)) for x in range(100)]
+    print(results)
