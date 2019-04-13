@@ -70,6 +70,7 @@ def multi_process_task(s):
     pe=PathEvaluation([onlineMPA.p.FireMap])
     pr1=pe.evaluate_path(onlineMPA.paths[0])
     pr2=pe.evaluate_path(executed_path)
+    print(flag,pr1,pr2)
     return flag,pr1,pr2
 if __name__ == '__main__':
     # s = sys.argv[1]
@@ -94,4 +95,5 @@ if __name__ == '__main__':
     # print()
     pool = mp.Pool(processes=10)
     results = [pool.apply(multi_process_task,args=(1,)) for x in range(100)]
+    print('Print combined results')
     print(results)
