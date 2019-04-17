@@ -180,7 +180,7 @@ class ProblemSetting():
                 monteCarloFireMap[h][k] =  new_firemap[k]
         return monteCarloFireMap
 
-    def __init__(self, target = [[10,16]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[10,18]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -236,7 +236,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 10
+        self.monteCarloHorizon = 30000
 
         if(_setting_num == 0):
             self.M = 4
