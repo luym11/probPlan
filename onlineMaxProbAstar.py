@@ -78,6 +78,7 @@ def multi_process_task(s):
     print(flag,pr1,pr2)
     print()
     return flag,pr1,pr2
+
 if __name__ == '__main__':
     s = sys.argv[1]
     onlineMPA = OnlineMaxProbAstar(step_size=int(s), _start = (8,0), _target = (10,18))
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     pe=PathEvaluation([onlineMPA.p.FireMap])
     pr1=pe.evaluate_path(onlineMPA.paths[0])
     pr2=pe.evaluate_path(executed_path)
-    print( onlineMPA.badFlag,pr1,pr2)
+    print(onlineMPA.badFlag, pr1, pr2)
     # step_size = 10
     
     # _t = time.time()
