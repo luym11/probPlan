@@ -5,9 +5,4 @@
 *.txt
 *.xml
 *.iml
-result
-result_10_100_00
-result_10_10_00
-result_10_10_01
-result_5_10_00
-result_10_10_02
+result*
