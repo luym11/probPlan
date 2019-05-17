@@ -5,9 +5,10 @@ _COST_INF = 49
 
 class PathEvaluation(object):
 
-    def __init__(self, monteCarloFireMap):
+    def __init__(self, monteCarloFireMap, target=[[-1, -1]]):
         self.monteCarloHorizon = len(monteCarloFireMap)
         self.monteCarloFireMap = monteCarloFireMap
+        self.target = target[0]
         #self.monteCarloFireMapArray = np.array(monteCarloFireMap)
 
     def evaluate_path(self, path):
@@ -73,7 +74,7 @@ class PathEvaluation(object):
 
     def is_segment_safe_in_episode(self, p1, p2, t, episodeFireMap):
         if t >= _COST_INF:
-            if episodeFireMap[t][p1[0]][p1[1]] > 0.9:
+            if [p1[0],p1[1]] != self.target:
                 return False
         elif episodeFireMap[t][p1[0]][p1[1]] > 0.9 or episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:
             return False

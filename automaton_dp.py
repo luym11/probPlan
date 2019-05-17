@@ -45,7 +45,7 @@ class AutomatonDP:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
-        self.pe = path_evaluation.PathEvaluation(self.FireMap)
+        self.pe = path_evaluation.PathEvaluation(self.FireMap, self.Target)
 
     def dfs(self, state, k):
         ################
