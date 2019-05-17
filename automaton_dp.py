@@ -45,6 +45,8 @@ class AutomatonDP:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
+        self.pe = path_evaluation.PathEvaluation(self.FireMap)
+
     def dfs(self, state, k):
         ################
         # do dfs from the initial state to generate all possible states at time k
@@ -81,7 +83,8 @@ class AutomatonDP:
             else:
                 #P_k[index][index] = 1-pr*(Nr+Dr/np.sqrt(2))
                 for nei in neighbors:
-                    probToFireAtNeighborState = self.averageFireMap[k][nei[0]][nei[1]]
+                    # probToFireAtNeighborState = self.averageFireMap[k][nei[0]][nei[1]]
+                    probToFireAtNeighborState = self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
                     if state[0] == nei[0] and state[1] == nei[1]:
                         self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
@@ -226,7 +229,8 @@ class AutomatonDP:
                         self.dfs2(nei, k, u)
             else:
                 for nei in neighbors:
-                    probToFireAtNeighborState = self.averageFireMap[k][nei[0]][nei[1]]
+                    # probToFireAtNeighborState = self.averageFireMap[k][nei[0]][nei[1]]
+                    probToFireAtNeighborState = self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
                     if state_[0] == nei[0] and state_[1] == nei[1]:
                         self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
@@ -416,10 +420,10 @@ class AutomatonDP:
 
         # constructing cost matrix g, terminal cost vector gT
         # gT
-        self.gT = [0 for state in range(N_state_r_last)]
+        self.gT = [0.0 for state in range(N_state_r_last)]
         # FOR SINGLE TARGET
         # self.gT[1] = 100 # gain 100 for winning the game
-        self.gT[2] = 100 # gain 100 for winning the game
+        self.gT[2] = 100.0 # gain 100 for winning the game
         self.gT[3] = 0 # 0 for reaching the fire
         self.g = [[[[0 for j in range(N_state_r_last)] for i in range(N_state_r_last)]for time_range in range(self.T)]for control_range in range(self.N_control)]
         for t in range(self.T):

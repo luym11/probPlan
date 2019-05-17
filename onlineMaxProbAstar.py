@@ -78,36 +78,35 @@ def multi_process_task(s):
     print(flag,pr1,pr2)
     print()
     return flag,pr1,pr2
+
 if __name__ == '__main__':
-    # s = sys.argv[1]
-    # onlineMPA = OnlineMaxProbAstar(step_size=int(float(s)), start = (8,0), target = (10,16))
-    # _t = time.time()
-    # executed_path = onlineMPA.execution()
-    # elapsed_ = time.time() - _t
-    # # if(not onlineMPA.badFlag):
-    # print('step size')
-    # print(onlineMPA.step_size)
-    # print('time execution')
-    # print(elapsed_)
-    # print('original path')
-    # print(onlineMPA.paths[0])
-    # print('executed path')
-    # print(executed_path)
-    # pe=PathEvaluation([onlineMPA.p.FireMap])
-    # pr1=pe.evaluate_path(onlineMPA.paths[0])
-    # pr2=pe.evaluate_path(executed_path)
-    # print(pr1)
-    # print(pr2)
-    # print()
-    step_size = 10
-    
+    s = sys.argv[1]
+    onlineMPA = OnlineMaxProbAstar(step_size=int(s), _start = (8,0), _target = (10,18))
     _t = time.time()
-    pool = mp.Pool(processes=10)
-    results = [pool.apply(multi_process_task,args=(step_size,)) for x in range(100)]
+    executed_path = onlineMPA.execution()
     elapsed_ = time.time() - _t
+    # if(not onlineMPA.badFlag):
     print('step size')
-    print(step_size)
+    print(onlineMPA.step_size)
     print('time execution')
     print(elapsed_)
-    print('Print combined results for successing')
-    print(results)
+    print('original path')
+    print(onlineMPA.paths[0])
+    print('executed path')
+    print(executed_path)
+    pe=PathEvaluation([onlineMPA.p.FireMap])
+    pr1=pe.evaluate_path(onlineMPA.paths[0])
+    pr2=pe.evaluate_path(executed_path)
+    print(onlineMPA.badFlag, pr1, pr2)
+    # step_size = 10
+    
+    # _t = time.time()
+    # pool = mp.Pool(processes=10)
+    # results = [pool.apply(multi_process_task,args=(step_size,)) for x in range(100)]
+    # elapsed_ = time.time() - _t
+    # print('step size')
+    # print(step_size)
+    # print('time execution')
+    # print(elapsed_)
+    # print('Print combined results for successing')
+    # print(results)

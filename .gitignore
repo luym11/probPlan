@@ -3,3 +3,6 @@
 *.pyc
 *.jpeg
 *.txt
+*.xml
+*.iml
+result*

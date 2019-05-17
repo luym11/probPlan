@@ -155,6 +155,7 @@ class ProblemSetting():
         except:
             print('Folder existed!')
         for h in range(_GenerateHorizon):
+            print('started {} MC simulation'.format(h+1))
             new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
             try:
                 os.mkdir('./monteCarlo/monteCarloFireMapTrial'+str(h))
@@ -165,6 +166,7 @@ class ProblemSetting():
                 # save all instances
                 np.savetxt('./monteCarlo/monteCarloFireMapTrial'+str(h)+'/monteCarloFireMapAt'+str(k)+'.txt', new_firemap[k])
         for k in range(len(firemap_sum)):
+            print('started {} averaging'.format(k+1))
             firemap_sum[k] = np.divide(firemap_sum[k], _GenerateHorizon)
             np.savetxt('./monteCarloAverage/monteCarloAverageFireMap'+str(k)+'.txt', firemap_sum[k])
         return firemap_sum
@@ -180,7 +182,7 @@ class ProblemSetting():
                 monteCarloFireMap[h][k] =  new_firemap[k]
         return monteCarloFireMap
 
-    def __init__(self, target = [[10,18]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[18,16]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -236,7 +238,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 30000
+        self.monteCarloHorizon = 100
 
         if(_setting_num == 0):
             self.M = 4
@@ -247,10 +249,8 @@ class ProblemSetting():
             self.StartPoint = [[0,0]]
             self.EndPoint = [[3,3]]
             self.Target = [[1,2]]
-            self.Wall = [[1,1],
-                [1,3],
-                [2,3]]
-            self.Fire = [[2,1]]
+            self.Wall = []
+            self.Fire = [[1,3],[3,2],[2,3],[2,1],[0,0]]
         # Generate static Map and fire map list FireMap
         self.Map = self.mapCreator()
         self.FireMap = self.mapGenerator(self.T)
