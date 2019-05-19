@@ -238,7 +238,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 100
+        self.monteCarloHorizon = 3000
 
         if(_setting_num == 0):
             self.M = 4
