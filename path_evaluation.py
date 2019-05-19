@@ -66,15 +66,21 @@ class PathEvaluation(object):
     def evaluate_segment(self, t, p1, p2):
         # evaluate a length-1 segment from p1->p2 at t
         positiveCounter = 0
+        totalCounter = 0
         for h in range(self.monteCarloHorizon): # every episode
-            if(self.is_segment_safe_in_episode(p1, p2, t, self.monteCarloFireMap[h])):
-                positiveCounter += 1
-        safeProb = positiveCounter/self.monteCarloHorizon
+            if (self.is_path_safe_at_t(p1, self.monteCarloFireMap[h][t])):
+                totalCounter += 1
+                if(self.is_segment_safe_in_episode(p1, p2, t, self.monteCarloFireMap[h])):
+                    positiveCounter += 1
+        if totalCounter == 0:
+            safeProb = 0
+        else:
+            safeProb = positiveCounter/totalCounter
         return safeProb
 
     def is_segment_safe_in_episode(self, p1, p2, t, episodeFireMap):
-        if t >= _COST_INF:
-            if [p1[0],p1[1]] != self.target:
+        if t >= _COST_INF-1:
+            if [p2[0],p2[1]] != self.target or episodeFireMap[t][p1[0]][p1[1]] > 0.9:
                 return False
         elif episodeFireMap[t][p1[0]][p1[1]] > 0.9 or episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:
             return False
