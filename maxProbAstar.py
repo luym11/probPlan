@@ -9,9 +9,9 @@ import time
 
 
 class MaxProbAstar(AStar):
-    def __init__(self, p, monteCarloFireMap):
+    def __init__(self, p, monteCarloFireMap, _target=[-1,-1]):
         # p is the problem
-        self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
+        self.pe = PathEvaluation(monteCarloFireMap, target=_target) # pe is PathEvaluation instance
         self.M = p.M
         self.N = p.N
         self.Wall = p.Wall
@@ -22,19 +22,11 @@ class MaxProbAstar(AStar):
     def distance_between(self, n1, n2):
         # -log(Pr(till n2 is safe | till n1 is safe))
         pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
-        pathToN2 = pathToN1.copy()
-        pathToN2.append(n2)
-        p1 = self.pe.evaluate_path(pathToN1)
-        p2 = self.pe.evaluate_path(pathToN2)
-        if p2 == 0 or p1 == 0:
+        t = len(pathToN1) - 1 # not the best way, can store this t in the node
+        safeProb = self.pe.evaluate_segment(t,n1,n2)
+        if safeProb == 0:
             return float('inf')
-        # print('try moving from (%d,%d) to (%d,%d)' %(self.searchNodes[n1].data[0],self.searchNodes[n1].data[1],self.searchNodes[n2].data[0],self.searchNodes[n2].data[1]))
-        # print('path to be: ')
-        # print(pathToN1)
-        # print(pathToN2)
-        # print(p2/p1)
-        # print()
-        return -math.log(p2/p1)
+        return -math.log(safeProb)
 
     def neighbors(self, node):
         x, y = node
@@ -44,7 +36,7 @@ class MaxProbAstar(AStar):
         return current == goal
 
 if __name__ == '__main__':
-    p1 = problem_setting.ProblemSetting(_stochastic_environment_flag=1, _setting_num=1)
+    p1 = problem_setting.ProblemSetting(target = [[10, 18]],_stochastic_environment_flag=1, _setting_num=1)
     # monteCarloFireMap read in
     monteCarloAverageFireMap = [[] for i in range(len(p1.FireMap))]
     monteCarloFireMap = [[[] for k in range(len(p1.FireMap))] for h in range(p1.monteCarloHorizon)]
@@ -54,9 +46,10 @@ if __name__ == '__main__':
         for k in range(len(p1.FireMap)):
             monteCarloFireMap[h][k] = np.loadtxt('./monteCarlo/monteCarloFireMapTrial'+str(h)+'/monteCarloFireMapAt'+str(k)+'.txt')
     _t = time.time()
-    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap).astar((8,0),(10,18))
+    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap, _target=[10,18]).astar((8,0),(10,18))
     path = list(_path)
     elapsed_ = time.time() - _t
     pe=PathEvaluation(monteCarloFireMap)
     pr=pe.evaluate_path(path)
+    print(path)
     print('Prob is %f, Computation took: %d seconds' %(pr, elapsed_)) 
