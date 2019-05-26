@@ -45,8 +45,7 @@ class AutomatonDP:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
-        self.pe = path_evaluation.PathEvaluation(self.FireMap, self.Target)
-
+        self.pe = path_evaluation.PathEvaluation(self.FireMap, target = self.Target)
     def dfs(self, state, k):
         ################
         # do dfs from the initial state to generate all possible states at time k
@@ -57,7 +56,7 @@ class AutomatonDP:
         self.visited.add(state) # very important line
         # print("start dfs %s at time %d" %(state, k,))
         index = self.state_mapper.get(state)
-        if index == 1:
+        if index == 2:
             pass
             # print("successfully END rescue at time %d" %(k,))
             return
@@ -172,7 +171,7 @@ class AutomatonDP:
         # y = state[1]
         q = state[2]
         
-        if q == -3:
+        if q == -3 or q == -2:
             state_ = state
         elif v == 2 or q == 2: # fire, rescue terminates
             state_ = tuple([-1, -1, 2]) # goes to loose state directly
@@ -207,7 +206,7 @@ class AutomatonDP:
     def dfs2(self, state, k, u):
         self.visited.add(state)
         index = self.state_mapper.get(state)
-        if index == 1:
+        if index == 2:
             pass
             # print("successfully END rescue at time %d" %(k,))
             return
@@ -255,7 +254,7 @@ class AutomatonDP:
         y = state[1]
         q = state[2]
         state_ = state
-        if q == -3 or q == 2:
+        if q == -3 or q == 2 or q== -2:
             state_ = state
         elif u == 1:
             if self.isInsideMap(self.Map, tuple([x,y+1,q])):
@@ -422,7 +421,8 @@ class AutomatonDP:
         print('Constructing P took: %d seconds' %(elapsed_)) 
 
         # PRAMS
-        N_state_r_last = len(self.state_mapper)
+        # N_state_r_last = len(self.state_mapper)
+        N_state_r_last = 372
 
         # constructing cost matrix g, terminal cost vector gT
         # gT

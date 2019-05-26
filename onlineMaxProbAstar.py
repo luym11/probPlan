@@ -41,7 +41,7 @@ class OnlineMaxProbAstar():
             currentFireMap = self.p.FireMap[i]
             monteCarloFireMap = self.generateMonteCarloMap(currentFireMap)
             try:
-                _path, searchNodes, lastNode = MaxProbAstar(self.p, monteCarloFireMap).astar(start, target)
+                _path, searchNodes, lastNode = MaxProbAstar(self.p, monteCarloFireMap,_target=list(self.target)).astar(start, target)
             except:
                 # print(start)
                 # print(self.p.FireMap[i][start[0]][start[1]])
