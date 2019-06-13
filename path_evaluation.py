@@ -1,7 +1,7 @@
 import math
 import numpy as np
 _PROB_INF = 10000
-_COST_INF = 49
+_COST_INF = 7
 
 class PathEvaluation(object):
 
@@ -79,9 +79,6 @@ class PathEvaluation(object):
         return safeProb
 
     def is_segment_safe_in_episode(self, p1, p2, t, episodeFireMap):
-        if t >= _COST_INF-1:
-            if [p2[0],p2[1]] != self.target or episodeFireMap[t][p1[0]][p1[1]] > 0.9:
-                return False
-        elif episodeFireMap[t][p1[0]][p1[1]] > 0.9 or episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:
+        if episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:
             return False
         return True
