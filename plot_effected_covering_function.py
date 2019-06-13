@@ -67,14 +67,17 @@ plt.figure(1)
 plt.subplot(311)
 intersection_matrix0 = np.transpose(monteCarloFireMap[s][t])
 ax = sns.heatmap(intersection_matrix0, annot=True, fmt='.2f', vmin=0, vmax=1)
+plt.ylim(reversed(plt.ylim()))
 
 plt.subplot(312)
 intersection_matrix1 = np.transpose(monteCarloAverageFireMap[t])
 ax = sns.heatmap(intersection_matrix1, annot=True, fmt='.2f', vmin=0, vmax=1)
+plt.ylim(reversed(plt.ylim()))
 
 plt.subplot(313)
 intersection_matrix2 = np.transpose(firemap_sum[t])
 ax = sns.heatmap(intersection_matrix2, annot=True, fmt='.2f', vmin=0, vmax=1)
+plt.ylim(reversed(plt.ylim()))
 plt.show()
 
 plt.figure(2)
@@ -82,4 +85,5 @@ tt = 13
 subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
 subtractedMatrix = np.transpose(subtractedMap)
 ax = sns.heatmap(subtractedMatrix, annot=True, fmt='.2f', vmin=0, vmax=1)
+plt.ylim(reversed(plt.ylim()))
 plt.show()
