@@ -4,6 +4,7 @@ import csv
 import time
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 class ProblemSetting():
 
@@ -175,14 +176,24 @@ class ProblemSetting():
         # Do as compute_monteCarlo but not saving
         # Time horizon fixed to be len(self.FireMap)
         monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
+        monteCarloAverageFireMap = np.array(np.copy(self.FireMap), dtype=np.float32)
         for h in range(_GenerateHorizon):
-            # monteCarloFireMap[h] = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            print('started {} MC simulation'.format(h+1))
             new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
             for k in range(len(self.FireMap)):
                 monteCarloFireMap[h][k] =  new_firemap[k]
-        return monteCarloFireMap
+                monteCarloAverageFireMap[k] = np.add(monteCarloAverageFireMap[k], new_firemap[k])
+        for k in range(len(self.FireMap)):
+            print('started {} averaging'.format(k+1))
+            monteCarloAverageFireMap[k] = np.divide(monteCarloAverageFireMap[k], _GenerateHorizon)
+        # pickle save
+        with open('MCFMs3000', 'wb') as fp:
+            pickle.dump(monteCarloFireMap, fp)
+        with open('MCAFMs3000', 'wb') as fp:
+            pickle.dump(monteCarloAverageFireMap, fp)
+        return monteCarloAverageFireMap, monteCarloFireMap
 
-    def __init__(self, target = [[18,16]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[2,3]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -247,10 +258,10 @@ class ProblemSetting():
             # read in the (initial)map for map value checking
             # do notice the difference between this and the Matlab code (1 smaller in indices as py starts from 0)
             self.StartPoint = [[0,0]]
-            self.EndPoint = [[2,3]]
-            self.Target = [[2,3]]
+            self.EndPoint = target
+            self.Target = target
             self.Wall = [[1,3]]
-            self.Fire = [[0,2]]
+            self.Fire = [[1,2]]
         # Generate static Map and fire map list FireMap
         self.Map = self.mapCreator()
         self.FireMap = self.mapGenerator(self.T)
