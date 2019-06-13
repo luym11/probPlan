@@ -243,14 +243,14 @@ class ProblemSetting():
         if(_setting_num == 0):
             self.M = 4
             self.N = 4
-            self.T = 20
+            self.T = 8
             # read in the (initial)map for map value checking
             # do notice the difference between this and the Matlab code (1 smaller in indices as py starts from 0)
             self.StartPoint = [[0,0]]
-            self.EndPoint = [[3,3]]
-            self.Target = [[1,2]]
-            self.Wall = []
-            self.Fire = [[1,3],[3,2],[2,3],[2,1],[0,0]]
+            self.EndPoint = [[2,3]]
+            self.Target = [[2,3]]
+            self.Wall = [[1,3]]
+            self.Fire = [[0,2]]
         # Generate static Map and fire map list FireMap
         self.Map = self.mapCreator()
         self.FireMap = self.mapGenerator(self.T)
