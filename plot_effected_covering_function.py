@@ -8,6 +8,7 @@ import plot3d_fire
 from maxProbAstar import MaxProbAstar
 from path_evaluation import PathEvaluation
 import pickle
+import imageio
 
 # # save stuff as pickle
 with open('MCFMs3000', 'wb') as fp:
@@ -32,8 +33,8 @@ monteCarloAverageFireMap = pickle.load(open('MCAFMs', "rb"))
 # let's do a sample
 s = 8
 T=10
-x = 6
-y = 14
+x = 7
+y = 9
 currentRunMap = monteCarloFireMap[s][T] # at s th trial, T
 locationArray = np.array([[x+i,y+j] for i in range(-1,2) for j in range(-1,2)])
 rows=locationArray[:,0]
@@ -81,9 +82,21 @@ plt.ylim(reversed(plt.ylim()))
 plt.show()
 
 plt.figure(2)
-tt = 13
-subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
+subtractedMap = np.subtract(monteCarloAverageFireMap[t], firemap_sum[t])
 subtractedMatrix = np.transpose(subtractedMap)
 ax = sns.heatmap(subtractedMatrix, annot=True, fmt='.2f', vmin=0, vmax=1)
 plt.ylim(reversed(plt.ylim()))
 plt.show()
+
+# anime plots
+images = []
+for tt in range(10,50):
+    fig = plt.figure()
+    subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
+    subtractedMatrix = np.transpose(subtractedMap)
+    ax = sns.heatmap(subtractedMatrix, annot=False,vmin=0, vmax=1)
+    plt.ylim(reversed(plt.ylim()))
+    fig.savefig('figs/plot'+ str(tt) +'.jpeg')
+    plt.close()
+    images.append(imageio.imread('figs/plot'+ str(tt) +'.jpeg'))
+imageio.mimsave('wave_of_difference.gif', images)
