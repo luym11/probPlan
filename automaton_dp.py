@@ -82,11 +82,11 @@ class AutomatonDP:
             else:
                 #P_k[index][index] = 1-pr*(Nr+Dr/np.sqrt(2))
                 for nei in neighbors:
-                    # if(k >= self.T-1):
-                    #     probToFireAtNeighborState = 0
-                    # else:
-                    #     probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
-                    probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
+                    if(k >= self.T-1):
+                        probToFireAtNeighborState = 1
+                    else:
+                        # probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
+                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
                     if state[0] == nei[0] and state[1] == nei[1]:
                         self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
@@ -231,11 +231,11 @@ class AutomatonDP:
                         self.dfs2(nei, k, u)
             else:
                 for nei in neighbors:
-                    # if(k >= self.T-1):
-                    #     probToFireAtNeighborState = 0
-                    # else:
-                    #     probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
-                    probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
+                    if(k >= self.T-1):
+                        probToFireAtNeighborState = 1
+                    else:
+                        # probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
+                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
                     if state_[0] == nei[0] and state_[1] == nei[1]:
                         self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
@@ -421,8 +421,7 @@ class AutomatonDP:
         print('Constructing P took: %d seconds' %(elapsed_)) 
 
         # PRAMS
-        # N_state_r_last = len(self.state_mapper)
-        N_state_r_last = 372
+        N_state_r_last = len(self.state_mapper)
 
         # constructing cost matrix g, terminal cost vector gT
         # gT
