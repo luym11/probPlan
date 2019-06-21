@@ -4,6 +4,7 @@ import csv
 import time
 import matplotlib.pyplot as plt
 import os
+import pickle
 
 class ProblemSetting():
 
@@ -175,12 +176,22 @@ class ProblemSetting():
         # Do as compute_monteCarlo but not saving
         # Time horizon fixed to be len(self.FireMap)
         monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
+        monteCarloAverageFireMap = np.array(np.copy(self.FireMap), dtype=np.float32)
         for h in range(_GenerateHorizon):
-            # monteCarloFireMap[h] = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+            print('started {} MC simulation'.format(h+1))
             new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
             for k in range(len(self.FireMap)):
                 monteCarloFireMap[h][k] =  new_firemap[k]
-        return monteCarloFireMap
+                monteCarloAverageFireMap[k] = np.add(monteCarloAverageFireMap[k], new_firemap[k])
+        for k in range(len(self.FireMap)):
+            print('started {} averaging'.format(k+1))
+            monteCarloAverageFireMap[k] = np.divide(monteCarloAverageFireMap[k], _GenerateHorizon)
+        # pickle save
+        with open('MCFMs', 'wb') as fp:
+            pickle.dump(monteCarloFireMap, fp)
+        with open('MCAFMs', 'wb') as fp:
+            pickle.dump(monteCarloAverageFireMap, fp)
+        return monteCarloAverageFireMap, monteCarloFireMap
 
     def __init__(self, target = [[18,16]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
@@ -238,7 +249,7 @@ class ProblemSetting():
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 3000
+        self.monteCarloHorizon = 300
 
         if(_setting_num == 0):
             self.M = 4
