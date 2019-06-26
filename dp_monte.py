@@ -9,6 +9,7 @@ from path_evaluation import PathEvaluation
 import pickle
 import seaborn as sns
 import imageio
+import os
 
 _SIZE = 20
 
@@ -101,6 +102,7 @@ plt.show()
 # anime plots
 newRoute = np.array([(x,y) for (x,y,q) in routesFromNow2])
 images = []
+os.mkdir("figs")
 for tt in range(7,50):
     fig = plt.figure(tt)
     # prepare data
@@ -116,7 +118,8 @@ for tt in range(7,50):
         valueFunctionMap2[x,y] = valueFunction2[aDP1.state_mapper.get((x,y,q))]
     transposedSubtractedMap = np.subtract(np.transpose(valueFunctionMap2), np.transpose(valueFunctionMap1))
     ax = sns.heatmap(transposedSubtractedMap, annot=False,vmin=-2, vmax=2)
-    plt.plot(newRoute[:tt-6,0],newRoute[:tt-6,1],'bD')
+    plt.plot(newRoute[:tt-6,0] + 0.5,newRoute[:tt-6,1] + 0.5,c='b')
+    # plt.grid(linestyle = '--')
     plt.ylim(reversed(plt.ylim()))
     fig.savefig('figs/plot'+ str(tt) +'.jpeg')
     plt.close()
