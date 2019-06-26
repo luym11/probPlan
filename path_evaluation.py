@@ -5,10 +5,27 @@ _COST_INF = 49
 
 class PathEvaluation(object):
 
-    def __init__(self, monteCarloFireMap, target=[[-1, -1]]):
+    def __init__(self, monteCarloFireMap, target=[[-1, -1]], observeTime=0, observeFireState=None,x=0,y=0):
         self.monteCarloHorizon = len(monteCarloFireMap)
         self.monteCarloFireMap = monteCarloFireMap
         self.target = target[0]
+
+        # observation will disable many samples
+        if not observeFireState is None:
+            locationArray = np.array([[x+i,y+j] for i in range(-1,2) for j in range(-1,2)])
+            rows=locationArray[:,0]
+            cols=locationArray[:,1]
+            deleteList = []
+            # remove some monteCarloFireMaps
+            for i in range(self.monteCarloHorizon):
+                currentEpisodeMapArray = np.array(self.monteCarloFireMap[i][observeTime])
+                currentEpisodeFireState = currentEpisodeMapArray[rows,cols]
+                if not np.array_equal(observeFireState, currentEpisodeFireState):
+                    deleteList.append(i)
+            for index in sorted(deleteList, reverse=True):
+                del monteCarloFireMap[index]
+            self.monteCarloHorizon = len(self.monteCarloFireMap)
+            print('new monteCarloHorizon is {}'.format(self.monteCarloHorizon))
         #self.monteCarloFireMapArray = np.array(monteCarloFireMap)
 
     def evaluate_path(self, path):

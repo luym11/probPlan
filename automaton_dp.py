@@ -7,7 +7,7 @@ import path_evaluation
 
 class AutomatonDP:
 
-    def __init__(self, M, N, T, Map, averageFireMap, FireMap, StartPoint, EndPoint, Target, Wall, Fire, Q=4, N_control=5):
+    def __init__(self, M, N, T, Map, averageFireMap, FireMap, StartPoint, EndPoint, Target, Wall, Fire, Q=4, N_control=5,_observeTime=0, _observeFireState=None, _observeX=0,_observeY=0):
         self.M = M
         self.N = N
         self.T = T
@@ -45,7 +45,7 @@ class AutomatonDP:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
-        self.pe = path_evaluation.PathEvaluation(self.FireMap, target = self.Target)
+        self.pe = path_evaluation.PathEvaluation(self.FireMap, target = self.Target, observeTime=_observeTime, observeFireState=_observeFireState, x=_observeX, y=_observeY)
     def dfs(self, state, k):
         ################
         # do dfs from the initial state to generate all possible states at time k
