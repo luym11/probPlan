@@ -41,7 +41,7 @@ rows=locationArray[:,0]
 cols=locationArray[:,1]
 currentRunMapArray = np.array(currentRunMap)
 currentFireState = currentRunMapArray[rows,cols]
-
+# currentFireState = np.array([1,0,0,0,0,0,0,0,0])
 # compute covering function but only include samples consistent with our observation
 # now we use 30000
 _GenerateHorizon = 30000
