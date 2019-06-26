@@ -352,7 +352,7 @@ class AutomatonDP:
                 Js[timeStep][initialStateNumber] = npJ[initialStateNumber, timeStep]
                 for t in range(T-timeStep):
                     prevStateNumber = self.state_mapper.get(prevState)
-                    controls[timeStep][initialStateNumber][t] = choice[prevStateNumber][t]
+                    controls[timeStep][initialStateNumber][t] = choice[prevStateNumber][timeStep+t]
                     currentState = self.next_state(prevState, t, controls[timeStep][initialStateNumber][t])
                     prevState = currentState
                     routes[timeStep][initialStateNumber][t+1] = currentState
