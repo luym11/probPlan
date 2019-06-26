@@ -41,7 +41,7 @@ rows=locationArray[:,0]
 cols=locationArray[:,1]
 currentRunMapArray = np.array(currentRunMap)
 currentFireState = currentRunMapArray[rows,cols]
-
+# currentFireState = np.array([1,0,0,0,0,0,0,0,0])
 # compute covering function but only include samples consistent with our observation
 # now we use 30000
 _GenerateHorizon = 30000
@@ -84,7 +84,7 @@ plt.show()
 plt.figure(2)
 subtractedMap = np.subtract(monteCarloAverageFireMap[t], firemap_sum[t])
 subtractedMatrix = np.transpose(subtractedMap)
-ax = sns.heatmap(subtractedMatrix, annot=True, fmt='.2f', vmin=0, vmax=1)
+ax = sns.heatmap(subtractedMatrix, annot=True, fmt='.2f', vmin=-1, vmax=1)
 plt.ylim(reversed(plt.ylim()))
 plt.show()
 
@@ -94,7 +94,7 @@ for tt in range(10,50):
     fig = plt.figure()
     subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
     subtractedMatrix = np.transpose(subtractedMap)
-    ax = sns.heatmap(subtractedMatrix, annot=False,vmin=0, vmax=1)
+    ax = sns.heatmap(subtractedMatrix, annot=False,vmin=-1, vmax=1)
     plt.ylim(reversed(plt.ylim()))
     fig.savefig('figs/plot'+ str(tt) +'.jpeg')
     plt.close()
