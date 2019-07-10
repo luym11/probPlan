@@ -65,7 +65,10 @@ class PathEvaluation(object):
         for h in range(self.monteCarloHorizon): # every episode
             if(self.is_path_safe_in_episode(path, self.monteCarloFireMap[h])):
                 positiveCounter += 1
-        safeProb = positiveCounter/self.monteCarloHorizon
+        if self.monteCarloHorizon == 0:
+            safeProb = 0
+        else:
+            safeProb = positiveCounter/self.monteCarloHorizon
         return safeProb
 
     def is_path_safe_in_episode(self, path, episodeFireMap):
