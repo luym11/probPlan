@@ -447,6 +447,7 @@ class AutomatonDP:
         print(J0)
 
         self.remove_duplicated_path_segs(route) # only do once
+        self.remove_duplicated_path_segs(self.routes)
         # Visualize the optimal controls
         route_array = np.asarray(route)
         x = route_array[:,0]
@@ -480,13 +481,13 @@ class AutomatonDP:
         plt.plot(x,y,c='m')
         plt.grid(linestyle = '--')
         # plt.show()
-        fig.savefig('dp_planning_2d.jpeg')
+        fig.savefig('dp_planning_g.jpeg')
 
-        pe1 = path_evaluation.PathEvaluation(self.FireMap)
-        DPscore = pe1.evaluate_path(route)
         print('printing optimal DP path together')
         print(route)
         print('DP solution length: %d' %(len(route)))
+        pe1 = path_evaluation.PathEvaluation(self.FireMap, target = self.Target)
+        DPscore = pe1.evaluate_path(route)
         print('DP solution probability: %f' %(DPscore) )
 
     def query_optimal_solution(self, queryStartTime, queryStartState):
