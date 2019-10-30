@@ -5,10 +5,9 @@ _COST_INF = 49
 
 class PathEvaluation(object):
 
-    def __init__(self, monteCarloFireMap, target=[[-1, -1]], observeTime=0, observeFireState=None,x=0,y=0):
+    def __init__(self, monteCarloFireMap, observeTime=0, observeFireState=None,x=0,y=0):
         self.monteCarloHorizon = len(monteCarloFireMap)
         self.monteCarloFireMap = monteCarloFireMap
-        self.target = target[0]
 
         # observation will disable many samples
         if x==-1 and (not observeFireState is None): # the case where we observe all the map

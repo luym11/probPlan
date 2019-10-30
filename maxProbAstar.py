@@ -6,12 +6,15 @@ import problem_setting
 from path_evaluation import PathEvaluation
 import numpy as np
 import time
-
+import pickle
+import seaborn as sns
+import os
+from utils.plotPath import plotPathPic
 
 class MaxProbAstar(AStar):
-    def __init__(self, p, monteCarloFireMap, _target=[-1,-1]):
+    def __init__(self, p, monteCarloFireMap):
         # p is the problem
-        self.pe = PathEvaluation(monteCarloFireMap, target=_target) # pe is PathEvaluation instance
+        self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
         self.M = p.M
         self.N = p.N
         self.Wall = p.Wall
@@ -36,20 +39,23 @@ class MaxProbAstar(AStar):
         return current == goal
 
 if __name__ == '__main__':
-    p1 = problem_setting.ProblemSetting(target = [[10, 18]],_stochastic_environment_flag=1, _setting_num=1)
+    # aim to find safest path between two points
+    # thus, only need a start point and a end point here,
+    # what is in p1 does not matter (see _init_ of this class)
+    p1 = problem_setting.ProblemSetting(target = [[18,16]],_stochastic_environment_flag=1, _setting_num=1)
     # monteCarloFireMap read in
-    monteCarloAverageFireMap = [[] for i in range(len(p1.FireMap))]
-    monteCarloFireMap = [[[] for k in range(len(p1.FireMap))] for h in range(p1.monteCarloHorizon)]
-    for k in range(len(p1.FireMap)):
-        monteCarloAverageFireMap[k] = np.loadtxt('./monteCarloAverage/monteCarloAverageFireMap'+str(k)+'.txt')
-    for h in range(p1.monteCarloHorizon):
-        for k in range(len(p1.FireMap)):
-            monteCarloFireMap[h][k] = np.loadtxt('./monteCarlo/monteCarloFireMapTrial'+str(h)+'/monteCarloFireMapAt'+str(k)+'.txt')
+    monteCarloAverageFireMap = pickle.load(open('MCAFMs300', "rb"))
+    monteCarloFireMap = pickle.load(open('MCFMs300', "rb"))
+
+    # test
     _t = time.time()
-    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap, _target=[10,18]).astar((8,0),(10,18))
+    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap).astar((8,0),(10,18))
     path = list(_path)
     elapsed_ = time.time() - _t
     pe=PathEvaluation(monteCarloFireMap)
     pr=pe.evaluate_path(path)
     print(path)
     print('Prob is %f, Computation took: %d seconds' %(pr, elapsed_)) 
+
+    # plot a path
+    plotPathPic(path, monteCarloAverageFireMap)
