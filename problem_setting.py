@@ -240,6 +240,7 @@ class ProblemSetting():
             [17,11],
             [17,12],
             [17,13]]
+        # self.Wall=[[19,19]]
         # This only reflects Fire at t=0, and will NOT be updated
         # Fire = [[1, 18], [11, 16]] 
         self.Fire = [[1, 18], [7,11],[2,4]]
