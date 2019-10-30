@@ -114,3 +114,24 @@ class PathEvaluation(object):
         if episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:
             return False
         return True
+
+    def evaluate_path_t(self, path, _T):
+        # note this path is from time _T. 
+        
+        # monteCarloFireMapArray[h][t] is h episode at time=t
+        positiveCounter = 0
+        for h in range(self.monteCarloHorizon): # every episode
+            if(self.is_path_safe_in_episode_t(path, self.monteCarloFireMap[h], _T)):
+                positiveCounter += 1
+        if self.monteCarloHorizon == 0:
+            safeProb = 0
+        else:
+            safeProb = positiveCounter/self.monteCarloHorizon
+        return safeProb
+
+    def is_path_safe_in_episode_t(self, path, episodeFireMap, _T):
+        T = len(path)
+        for t in range(1,T):
+            if(not self.is_path_safe_at_t(path[t], episodeFireMap[_T+t])):
+                return False
+        return True
