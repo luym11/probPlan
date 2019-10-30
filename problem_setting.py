@@ -187,9 +187,9 @@ class ProblemSetting():
             print('started {} averaging'.format(k+1))
             monteCarloAverageFireMap[k] = np.divide(monteCarloAverageFireMap[k], _GenerateHorizon)
         # pickle save
-        with open('MCFMs', 'wb') as fp:
+        with open('MCFMs'+str(_GenerateHorizon), 'wb') as fp:
             pickle.dump(monteCarloFireMap, fp)
-        with open('MCAFMs', 'wb') as fp:
+        with open('MCAFMs'+str(_GenerateHorizon), 'wb') as fp:
             pickle.dump(monteCarloAverageFireMap, fp)
         return monteCarloAverageFireMap, monteCarloFireMap
 
@@ -243,14 +243,14 @@ class ProblemSetting():
         # self.Wall=[[19,19]]
         # This only reflects Fire at t=0, and will NOT be updated
         # Fire = [[1, 18], [11, 16]] 
-        self.Fire = [[1, 18], [7,11],[2,4]]
+        self.Fire = [[18, 18], [3,12],[13,12]]
         self.pf0 = 0.087 # 0.087
         self.pf1 = 0.01
 
         self.Map = []
         self.FireMap = []
 
-        self.monteCarloHorizon = 300
+        self.monteCarloHorizon = 0 # anyway will be changed in compute_monteCarlo function
 
         if(_setting_num == 0):
             self.M = 4
