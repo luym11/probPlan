@@ -11,7 +11,19 @@ class PathEvaluation(object):
         self.target = target[0]
 
         # observation will disable many samples
-        if not observeFireState is None:
+        if x==-1 and (not observeFireState is None): # the case where we observe all the map
+            deleteList = []
+            # remove some monteCarloFireMaps
+            for i in range(self.monteCarloHorizon):
+                currentEpisodeMapArray = np.array(self.monteCarloFireMap[i][observeTime])
+                currentEpisodeFireState = currentEpisodeMapArray
+                if not np.array_equal(observeFireState, currentEpisodeFireState):
+                    deleteList.append(i)
+            for index in sorted(deleteList, reverse=True):
+                del self.monteCarloFireMap[index]
+            self.monteCarloHorizon = len(self.monteCarloFireMap)
+            print('new monteCarloHorizon is {}'.format(self.monteCarloHorizon))
+        elif not observeFireState is None: 
             locationArray = np.array([[x+i,y+j] for i in range(-1,2) for j in range(-1,2)])
             rows=locationArray[:,0]
             cols=locationArray[:,1]
@@ -23,7 +35,7 @@ class PathEvaluation(object):
                 if not np.array_equal(observeFireState, currentEpisodeFireState):
                     deleteList.append(i)
             for index in sorted(deleteList, reverse=True):
-                del monteCarloFireMap[index]
+                del self.monteCarloFireMap[index]
             self.monteCarloHorizon = len(self.monteCarloFireMap)
             print('new monteCarloHorizon is {}'.format(self.monteCarloHorizon))
         #self.monteCarloFireMapArray = np.array(monteCarloFireMap)
