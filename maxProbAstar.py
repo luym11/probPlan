@@ -12,12 +12,13 @@ import os
 from utils.plotPath import plotPathPic
 
 class MaxProbAstar(AStar):
-    def __init__(self, p, monteCarloFireMap):
+    def __init__(self, p, monteCarloFireMap, startTime=0):
         # p is the problem
         self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
         self.M = p.M
         self.N = p.N
         self.Wall = p.Wall
+        self.startTime = startTime
 
     def heuristic_cost_estimate(self, n1, n2):
         return 0
@@ -25,7 +26,7 @@ class MaxProbAstar(AStar):
     def distance_between(self, n1, n2):
         # -log(Pr(till n2 is safe | till n1 is safe))
         pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
-        t = len(pathToN1) - 1 # not the best way, can store this t in the node
+        t = len(pathToN1) - 1 + self.startTime # not the best way, can store this t in the node
         safeProb = self.pe.evaluate_segment(t,n1,n2)
         if safeProb == 0:
             return float('inf')
@@ -49,11 +50,12 @@ if __name__ == '__main__':
 
     # test
     _t = time.time()
-    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap).astar((8,0),(10,18))
+    startTime = 3
+    _path, searchNodes, lastNode = MaxProbAstar(p1, monteCarloFireMap, startTime).astar((8,0),(10,18))
     path = list(_path)
     elapsed_ = time.time() - _t
     pe=PathEvaluation(monteCarloFireMap)
-    pr=pe.evaluate_path(path)
+    pr=pe.evaluate_path_t(path, startTime)
     print(path)
     print('Prob is %f, Computation took: %d seconds' %(pr, elapsed_)) 
 
