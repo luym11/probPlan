@@ -56,7 +56,7 @@ class AutomatonDP:
         self.visited.add(state) # very important line
         # print("start dfs %s at time %d" %(state, k,))
         index = self.state_mapper.get(state)
-        if index == 2:
+        if index == 1:
             pass
             # print("successfully END rescue at time %d" %(k,))
             return
@@ -171,7 +171,8 @@ class AutomatonDP:
         # y = state[1]
         q = state[2]
         
-        if q == -3 or q == -2:
+        # if q == -3 or q == -2:
+        if q == -3:
             state_ = state
         elif v == 2 or q == 2: # fire, rescue terminates
             state_ = tuple([-1, -1, 2]) # goes to loose state directly
@@ -206,7 +207,7 @@ class AutomatonDP:
     def dfs2(self, state, k, u):
         self.visited.add(state)
         index = self.state_mapper.get(state)
-        if index == 2:
+        if index == 1:
             pass
             # print("successfully END rescue at time %d" %(k,))
             return
@@ -254,7 +255,8 @@ class AutomatonDP:
         y = state[1]
         q = state[2]
         state_ = state
-        if q == -3 or q == 2 or q== -2:
+        # if q == -3 or q == 2 or q== -2:
+        if q == -3 or q == 2:
             state_ = state
         elif u == 1:
             if self.isInsideMap(self.Map, tuple([x,y+1,q])):
@@ -376,9 +378,9 @@ class AutomatonDP:
                     # manually set absorbing states
                     self.P_k[1][1] = 1
                     # FOR SINGLE TARGET
-                    for i in range(len(self.P_k[2])):
-                        self.P_k[2][i] = 0
-                    self.P_k[2][2] = 1
+                    # for i in range(len(self.P_k[2])):
+                    #     self.P_k[2][i] = 0
+                    # self.P_k[2][2] = 1
                     self.P_k[3][3] = 1 
                     N_state_r = len(self.state_mapper)
                     self.P_u[k] = [[0 for col in range(N_state_r)] for row in range(N_state_r)]
@@ -400,9 +402,9 @@ class AutomatonDP:
                     # manually set absorbing states
                     self.P_k[1][1] = 1
                     # FOR SINGLE TARGET
-                    for i in range(len(self.P_k[2])):
-                        self.P_k[2][i] = 0
-                    self.P_k[2][2] = 1
+                    # for i in range(len(self.P_k[2])):
+                    #     self.P_k[2][i] = 0
+                    # self.P_k[2][2] = 1
                     self.P_k[3][3] = 1 
                     N_state_r = len(self.state_mapper)
                     self.P_u[k] = [[0 for col in range(N_state_r)] for row in range(N_state_r)]
@@ -427,8 +429,8 @@ class AutomatonDP:
         # gT
         self.gT = [0.0 for state in range(N_state_r_last)]
         # FOR SINGLE TARGET
-        # self.gT[1] = 100 # gain 100 for winning the game
-        self.gT[2] = 100.0 # gain 100 for winning the game
+        self.gT[1] = 100 # gain 100 for winning the game
+        # self.gT[2] = 100.0 # gain 100 for winning the game
         self.gT[3] = 0 # 0 for reaching the fire
         self.g = [[[[0 for j in range(N_state_r_last)] for i in range(N_state_r_last)]for time_range in range(self.T)]for control_range in range(self.N_control)]
         for t in range(self.T):
@@ -503,7 +505,7 @@ class AutomatonDP:
         return costsFromNow, routesFromNow, controlsFromNow
 
     def remove_duplicated_path_segs(self, path):
-        endPath = tuple([self.Target[0][0],self.Target[0][1],-2])
+        endPath = tuple([self.EndPoint[0][0],self.EndPoint[0][1],-3])
         while(path[-2] == endPath):
             del path[-1]
         return
