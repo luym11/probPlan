@@ -24,3 +24,11 @@ aDP1
 20\*20_3000/MCAFMs3000
 
 20\*20_3000/MCFMs3000
+
+venv/*
+
+ploter.py
+
+dp_planning_2d_my_1_ps.psd
+
+*.jpg
