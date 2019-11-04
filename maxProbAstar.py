@@ -28,8 +28,9 @@ class MaxProbAstar(AStar):
         pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
         t = len(pathToN1) - 1 + self.startTime # not the best way, can store this t in the node
         safeProb = self.pe.evaluate_segment(t,n1,n2)
-        if safeProb == 0:
-            return float('inf')
+        assert safeProb != 0, "safeProb is 0! "
+        # if safeProb == 0:
+        #     return float('inf')
         return -math.log(safeProb)
 
     def neighbors(self, node):
