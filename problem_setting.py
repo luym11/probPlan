@@ -243,7 +243,7 @@ class ProblemSetting():
         # self.Wall=[[19,19]]
         # This only reflects Fire at t=0, and will NOT be updated
         # Fire = [[1, 18], [11, 16]] 
-        self.Fire = [[18, 18], [3,12],[13,12]]
+        self.Fire = [[3,12],[8,12]]
         self.pf0 = 0.087 # 0.087
         self.pf1 = 0.01
 
