@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle
+import itertools
 
-def plotPathPic(path, path2, monteCarloAverageFireMap):
+def plot_path(pathList1, pathList2, intersection_matrix):
     fig = plt.figure()
     ax = fig.gca()
-    min_val, max_val = 0, 20
-    intersection_matrix = np.transpose(monteCarloAverageFireMap[25])
     ax.matshow(intersection_matrix, cmap=plt.cm.Reds, origin='lower')
     ax.set_xticks(np.arange(0,20,1))
     ax.set_yticks(np.arange(0,20,1))
@@ -15,7 +14,7 @@ def plotPathPic(path, path2, monteCarloAverageFireMap):
     plt.plot(8, 0, 'bD')
     plt.plot(0, 16, 'bD')
     plt.plot(19, 12, 'gD')
-    Fire = [[3,12], [18,18],[13,12]]
+    Fire = [[3,12], [9,12]]
     Fire_array = np.asarray(Fire)
     plt.plot(Fire_array[:,0], Fire_array[:,1], 'rx')
     Wall = [[6,0],
@@ -55,10 +54,12 @@ def plotPathPic(path, path2, monteCarloAverageFireMap):
     plt.plot(Target_array[:,0], Target_array[:,1], 'yD')
     plt.grid(linestyle = '--')
     plt.gca().set_aspect('equal', adjustable='box')
-    pathArray = np.array(path)
+    path1 = list(itertools.chain.from_iterable(pathList1))
+    pathArray = np.array(path1)
     x = pathArray[:,0]
     y = pathArray[:,1]
     plt.plot(x,y,c='c')
+    path2 = list(itertools.chain.from_iterable(pathList2))
     pathArray2 = np.array(path2)
     x2 = pathArray2[:,0]
     y2 = pathArray2[:,1]
