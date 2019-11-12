@@ -193,7 +193,7 @@ class ProblemSetting():
             pickle.dump(monteCarloAverageFireMap, fp)
         return monteCarloAverageFireMap, monteCarloFireMap
 
-    def __init__(self, target = [[18,16]], _stochastic_environment_flag=1, _setting_num=1):
+    def __init__(self, target = [[18,16]], startPoint = [[8,0]], _stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -206,7 +206,7 @@ class ProblemSetting():
         self.T = 50 # time horizon for DP computation: usually less than the time for the fire to spread the whole map
         # read in the (initial)map for map value checking
         # do notice the difference between this and the Matlab code (1 smaller in indices as py starts from 0)
-        self.StartPoint = [[8,0]]
+        self.StartPoint = startPoint
         self.EndPoint = [[19,12]]
         self.Target = target
         # Target = [[8, 12]]
