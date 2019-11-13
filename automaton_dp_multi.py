@@ -45,7 +45,7 @@ class AutomatonDPMulti:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
-        self.pe = path_evaluation.PathEvaluation(self.FireMap, target = self.Target, observeTime=_observeTime, observeFireState=_observeFireState, x=_observeX, y=_observeY)
+        self.pe = path_evaluation.PathEvaluation(self.FireMap, observeTime=_observeTime, observeFireState=_observeFireState, x=_observeX, y=_observeY)
     def dfs(self, state, k):
         ################
         # do dfs from the initial state to generate all possible states at time k
