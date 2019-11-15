@@ -236,7 +236,7 @@ class AutomatonDP:
                         probToFireAtNeighborState = 1
                     else:
                         # probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
-                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
+                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state_[0],state_[1]],[nei[0],nei[1]])
                     if state_[0] == nei[0] and state_[1] == nei[1]:
                         self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
