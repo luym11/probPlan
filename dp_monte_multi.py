@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import problem_setting
-import automaton_dp
+import automaton_dp_multi
 import plot3d_fire
 from maxProbAstar import MaxProbAstar
 from path_evaluation import PathEvaluation
@@ -21,15 +21,13 @@ monteCarloAverageFireMap = pickle.load(open('MCAFMs300', "rb"))
 
 # problem setup
 targets = [[9,16],[13,16],[2,5]]
-x = 8
-y = 16
-p1 = problem_setting.ProblemSetting(target = [[x,y]],_stochastic_environment_flag=1, _setting_num=1)
+p1 = problem_setting.ProblemSetting(target = targets, startPoint = [[8,0],[0,16]], _stochastic_environment_flag=1, _setting_num=1)
 
 
-aDP1 = automaton_dp.AutomatonDP(p1.M,p1.N,p1.T,p1.Map,monteCarloAverageFireMap, monteCarloFireMap, p1.StartPoint,p1.EndPoint,p1.Target,p1.Wall,p1.Fire,Q=4)
+aDP1 = automaton_dp_multi.AutomatonDPMulti(p1.M,p1.N,p1.T,p1.Map,monteCarloAverageFireMap, monteCarloFireMap, p1.StartPoint,p1.EndPoint,p1.Target,p1.Wall,p1.Fire,Q=4)
 
 aDP1.solve()
-
+'''
 # we make an observation using s th MC sample at t=T, at location of the solution at t, its 3*3 surrounding neighbors
 s = 8
 T = 11 
@@ -159,3 +157,4 @@ for tt in range(11,50):
     plt.close()
     images.append(imageio.imread('figs/plot'+ str(tt) +'.jpeg'))
 imageio.mimsave('wave_of_difference_P.gif', images)
+'''
