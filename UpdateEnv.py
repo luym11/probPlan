@@ -21,9 +21,9 @@ class UpdateEnv():
         self.fireMap = fireMap
         self.aDP1 = aDP1 
 
-    def observe(self, s, T, xT, yT):
+    def observe_and_construct(self, s, T, xT, yT):
         # s: observe the s-th episode
-        # should return a list of elements that are enough to construct a new problem
+        # observe at T in (xT,yT), and construct a new problem based solely on the observed fire
         # the problem should have only the fire locations that we observed, and the rest of the 
         # elements remain the same
         # Use the observed current run map, redo the MC generating for this new problem (actually the new problem is solely for MC process)
@@ -119,6 +119,6 @@ if __name__ == '__main__':
 
     # # replan process
     # upe = UpdateEnv(monteCarloFireMap, aDP1)
-    # # 1. select proper s,T,xT,yT pair, do observe()
+    # # 1. select proper s,T,xT,yT pair, do observe_and_construct()
     # # s = 20, T=7, xT=8, yT=7
     upe = pickle.load(open('upe', "rb"))
