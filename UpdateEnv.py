@@ -120,5 +120,5 @@ if __name__ == '__main__':
     # # replan process
     # upe = UpdateEnv(monteCarloFireMap, aDP1)
     # # 1. select proper s,T,xT,yT pair, do observe()
-    # # s = 20
+    # # s = 20, T=7, xT=8, yT=7
     upe = pickle.load(open('upe', "rb"))
