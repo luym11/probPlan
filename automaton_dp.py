@@ -488,7 +488,7 @@ class AutomatonDP:
         print('printing optimal DP path together')
         print(route)
         print('DP solution length: %d' %(len(route)))
-        pe1 = path_evaluation.PathEvaluation(self.FireMap, target = self.Target)
+        pe1 = path_evaluation.PathEvaluation(self.FireMap)
         DPscore = pe1.evaluate_path(route)
         print('DP solution probability: %f' %(DPscore) )
 

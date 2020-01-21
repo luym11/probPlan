@@ -173,7 +173,7 @@ class ProblemSetting():
         return firemap_sum
 
     def compute_monteCarlo_2(self, _GenerateHorizon):
-        # Do as compute_monteCarlo but not saving
+        # Do as compute_monteCarlo and save
         # Time horizon fixed to be len(self.FireMap)
         monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
         monteCarloAverageFireMap = np.array(np.copy(self.FireMap), dtype=np.float32)
@@ -193,7 +193,19 @@ class ProblemSetting():
             pickle.dump(monteCarloAverageFireMap, fp)
         return monteCarloAverageFireMap, monteCarloFireMap
 
-    def __init__(self, target = [[18,16]], startPoint = [[8,0]], _stochastic_environment_flag=1, _setting_num=1):
+    def compute_monteCarlo_3(self, _GenerateHorizon, startTime):
+        # Do as compute_monteCarlo but not saving
+        # Time horizon start from startTime (specify when calling the function) to len(self.FireMap)
+        # Also generate horizon is specified when calling
+        monteCarloFireMap = [[[] for k in range(len(self.FireMap) - startTime)] for h in range(_GenerateHorizon)]
+        for h in range(_GenerateHorizon):
+            print('started {} MC simulation for NEW OBSERVATION'.format(h+1))
+            new_firemap = np.asarray(self.mapGenerator(self.T-startTime), dtype=np.float32)
+            for k in range(len(self.FireMap) - startTime):
+                monteCarloFireMap[h][k] =  new_firemap[k]
+        return monteCarloFireMap
+
+    def __init__(self, target = [[18,16]], startPoint = [[8,0]], fire=[[9,12], [3,6]], endPoint = [[19,12]],_stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
 
         # problem settings: 
@@ -207,7 +219,7 @@ class ProblemSetting():
         # read in the (initial)map for map value checking
         # do notice the difference between this and the Matlab code (1 smaller in indices as py starts from 0)
         self.StartPoint = startPoint
-        self.EndPoint = [[19,12]]
+        self.EndPoint = endPoint
         self.Target = target
         # Target = [[8, 12]]
         self.Wall = [[6,0],
@@ -242,8 +254,8 @@ class ProblemSetting():
             [17,13]]
         # self.Wall=[[19,19]]
         # This only reflects Fire at t=0, and will NOT be updated
-        # Fire = [[1, 18], [11, 16]] 
-        self.Fire = [[3,12],[8,12]]
+        self.Fire = fire
+        # self.Fire = [[3,12],[8,12]]
         self.pf0 = 0.087 # 0.087
         self.pf1 = 0.01
 
