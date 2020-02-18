@@ -10,7 +10,6 @@ import automaton_dp
 import plot3d_fire
 import pickle
 import seaborn as sns
-import imageio
 import os
 
 _SIZE = 20
@@ -44,6 +43,21 @@ class UpdateEnv():
         # results saving
         self.currentMonteCarloFireMap = currentMonteCarloFireMap
         self.pe = PathEvaluation(currentMonteCarloFireMap)
+
+    def observe(self, s, T, xT, yT):
+        # s: observe the s-th episode
+        # observe at T in (xT,yT), and return the observed fire
+        # assume observe size 1
+        self.T = T
+        self.xT=xT
+        self.yT=yT
+        currentRunMap = self.fireMap[s][T]
+        fireLocationArray = np.array([[xT+i,yT+j] for i in range(-1,2) for j in range(-1,2) if currentRunMap[xT+i,yT+j] == 1]) # can be empty, so need to test
+        if(fireLocationArray.size == 0):
+            fireLocationArray = None
+        else:
+            pass
+        return fireLocationArray
 
     # def observe_full(self, s, T):
     #     # observe everything from s episode at T
@@ -102,6 +116,53 @@ class UpdateEnv():
             possiblePathsAfter.append(routesFromNow)
         self.possiblePathsAfter = possiblePathsAfter
 
+    def safe_prob_from_model(self, T, k, x, y):
+        # returns safe probability of grid cell (x,y) at time T
+        return 1-monteCarloAverageFireMap[T+k][x][y]
+
+    def observe_prob_from_model(self, T, fireLocationArray):
+        # returns the probability of observing fireLocationArray at T, based on the model (MC simulations)
+        counter = 0
+        totalEpisodeNum = len(self.aDP1.FireMap)
+        for s in range(totalEpisodeNum):
+            if self.is_obsv_in_episode_s_T(fireLocationArray, s, T):
+                counter += 1
+        # print('Observed fire appears in {0} episodes'.format(counter))
+        return counter/totalEpisodeNum
+
+    def is_obsv_in_episode_s_T(self, fireLocationArray, s, T):
+        # returns if fireLocationArray is a subset of the fire in episode s at time T
+        # also, should satisfy that within range of view, two fires are exactly the same
+        currentRunMap = self.fireMap[s][T]
+        # fireLocationArrayFullsT_ = np.array(np.nonzero(currentRunMap))
+        fireLocationArrayFullsT_ = np.array([[self.xT+i,self.yT+j] for i in range(-1,2) for j in range(-1,2) if currentRunMap[self.xT+i,self.yT+j] == 1])
+        if (fireLocationArrayFullsT_.size == 0):
+            fireLocationArrayFullsT_ = None
+            return fireLocationArray is None
+        else:
+            # fireLocationArrayFullsT = fireLocationArrayFullsT_.reshape(fireLocationArrayFullsT_.shape[1],fireLocationArrayFullsT_.shape[0])
+            fireLocationArrayFullsTList = fireLocationArrayFullsT_.tolist()
+            fireLocationArrayList = fireLocationArray.tolist()
+            # only or r
+            return all(elem in fireLocationArrayFullsTList for elem in fireLocationArrayList) #and all(elem in fireLocationArrayList for elem in fireLocationArrayFullsTList)
+
+    def observe_prob_given_safe_cell(self, T, k, fireLocationArray, x, y):
+        # returns the probability of observing fireLocationArray given (x,y) is safe at T
+        observedEpisodeNum = 0
+        safeEpisodeNum = 0
+        totalEpisodeNum = len(self.aDP1.FireMap)
+        for s in range(totalEpisodeNum):
+            if self.fireMap[s][T+k][x][y] == 0:
+                safeEpisodeNum += 1
+                if self.is_obsv_in_episode_s_T(fireLocationArray, s, T):
+                    observedEpisodeNum += 1
+        # print('safeEpisodeNum is {0}, observedEpisodeNum is {1}'.format(safeEpisodeNum, observedEpisodeNum))
+        if safeEpisodeNum == 0:
+            return 0
+        else:
+            return observedEpisodeNum/safeEpisodeNum
+
+
 if __name__ == '__main__':
     # load stuff with pickle
     monteCarloFireMap = pickle.load(open('MCFMs1000', "rb"))
@@ -118,7 +179,45 @@ if __name__ == '__main__':
     aDP1 = pickle.load(open('aDP1',"rb"))
 
     # # replan process
-    # upe = UpdateEnv(monteCarloFireMap, aDP1)
     # # 1. select proper s,T,xT,yT pair, do observe_and_construct()
-    # # s = 20, T=7, xT=8, yT=7
-    upe = pickle.load(open('upe', "rb"))
+    upe = UpdateEnv(monteCarloFireMap, aDP1)
+    s = 20; T=7; xT=8; yT=7 # s=20, 11, 38
+    # s = 150; T=8; xT=8; yT=8 # only [7,7] hazard
+
+    # # upe = pickle.load(open('upe', "rb"))
+    # s = 20; T=7; xT=8; yT=7 # s=20, 11, 38
+    diffProbMap = np.zeros([30,20,20])
+    f = upe.observe(s,T,xT,yT)
+    print('Observed fires')
+    print(f)
+    py = upe.observe_prob_from_model(T, f)
+    for k in range(30):
+        for x in range(20):
+            for y in range(20):
+                px = upe.safe_prob_from_model(T,k,x,y)
+                pyx = upe.observe_prob_given_safe_cell(T,k,f,x,y)
+                if py != 0:
+                    pxNew = pyx*px/py
+                else:
+                    pxNew = px
+                    print("this can't be observed")
+                pxDiff = pxNew - px
+                # threshold 
+                if abs(pxDiff) < 0.1:
+                    pxDiff = 0
+                diffProbMap[k,x,y] = pxDiff
+
+    for k in range(30):
+        fig=plt.figure()
+        # threshold
+        ax=sns.heatmap(np.transpose(diffProbMap[k,:,:]),vmin=-1,vmax=0)
+        plt.ylim(reversed(plt.ylim()))
+        fig.savefig('fig_only78_s20_long/plot_worse'+str(k)+'.png')
+        plt.close()
+
+    #     fig=plt.figure()
+    #     # threshold
+    #     ax=sns.heatmap(np.transpose(diffProbMap[k,:,:]),vmin=0,vmax=1)
+    #     plt.ylim(reversed(plt.ylim()))
+    #     fig.savefig('fig_only78_s20_long/plot_better'+str(k)+'.png')
+    #     plt.close()
