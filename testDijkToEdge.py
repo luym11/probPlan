@@ -185,38 +185,38 @@ if __name__ == '__main__':
     T = 8; xT = 8; yT = 8; s = 138 # s=138 for (7,9), 7 for (7,7) # 653 for lots
     upe = UpdateEnv(aDP1.FireMap, monteCarloAverageFireMap, aDP1, STPFlag=_STPFlag, obsvEffectRange=_obsvEffectRange)
 
-    # if _STPFlag == 0:
-    #     _t = time.time()
-    #     diffProbMap = np.zeros([aDP1.T-T,20,20])
-    #     f = upe.observe(s,T,xT,yT)
-    #     print('Observed fires')
-    #     print(f) # f=np.array([[7,8]])
-    #     py = upe.observe_prob_from_model(T, f)
-    #     for k in range(1, aDP1.T-T): # we care from T+1
-    #         for x in range(20):
-    #             for y in range(20):
-    #                 px = upe.safe_prob_from_model(T,k,x,y)
-    #                 pyx = upe.observe_prob_given_safe_cell(T,k,f,x,y)
-    #                 if py != 0:
-    #                     pxNew = pyx*px/py
-    #                 else:
-    #                     pxNew = px
-    #                     print("this can't be observed")
-    #                 aDP1.updatedAverageFireMap[T+k][x][y] = 1 - pxNew
-    #                 pxDiff = pxNew - px
-    #                 # threshold 
-    #                 if abs(pxDiff) < 0.1:
-    #                     pxDiff = 0
-    #                 diffProbMap[k,x,y] = pxDiff
-    #     elapsed_ = time.time() - _t
-    #     print('Updating MK prob took: %f seconds' %(elapsed_))            
-    #     for k in range(aDP1.T-T):
-    #         fig=plt.figure()
-    #         # threshold
-    #         ax=sns.heatmap(np.transpose(diffProbMap[k,:,:]),vmin=-1,vmax=0)
-    #         plt.ylim(reversed(plt.ylim()))
-    #         fig.savefig('fig11/plot_worse'+str(k)+'.png')
-    #         plt.close()
+    if _STPFlag == 0:
+        _t = time.time()
+            # diffProbMap = np.zeros([aDP1.T-T,20,20])
+        f = upe.observe(s,T,xT,yT)
+        print('Observed fires')
+        print(f) # f=np.array([[7,8]])
+        py = upe.observe_prob_from_model(T, f)
+        for k in range(1, aDP1.T-T): # we care from T+1
+            for x in range(20):
+                for y in range(20):
+                    px = upe.safe_prob_from_model(T,k,x,y)
+                    pyx = upe.observe_prob_given_safe_cell(T,k,f,x,y)
+                    if py != 0:
+                        pxNew = pyx*px/py
+                    else:
+                        pxNew = px
+                        print("this can't be observed")
+                    aDP1.updatedAverageFireMap[T+k][x][y] = 1 - pxNew
+                    # pxDiff = pxNew - px
+                    # # threshold 
+                    # if abs(pxDiff) < 0.1:
+                    #     pxDiff = 0
+                    # diffProbMap[k,x,y] = pxDiff
+        elapsed_ = time.time() - _t
+        print('Updating MK prob took: %f seconds' %(elapsed_))            
+        # for k in range(aDP1.T-T):
+        #     fig=plt.figure()
+        #     # threshold
+        #     ax=sns.heatmap(np.transpose(diffProbMap[k,:,:]),vmin=-1,vmax=0)
+        #     plt.ylim(reversed(plt.ylim()))
+        #     fig.savefig('fig11/plot_worse'+str(k)+'.png')
+        #     plt.close()
     # else: # update STP
     #     pass
 
