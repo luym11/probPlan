@@ -12,26 +12,39 @@ import os
 from utils.plotPath import plotPathPic
 
 class MaxProbAstar(AStar):
-    def __init__(self, p, monteCarloFireMap, startTime=0):
+    def __init__(self, p, monteCarloFireMap, aDP1=None, startTime=0, monteCarloFlag=1, STPFlag = 1, monteCarloAverageFireMap = None):
         # p is the problem
-        self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
-        self.M = p.M
-        self.N = p.N
-        self.Wall = p.Wall
+        if p != None:
+            self.pe = PathEvaluation(monteCarloFireMap) # pe is PathEvaluation instance
+        else:
+            self.pe = None
+        self.M = aDP1.M
+        self.N = aDP1.N
+        self.Wall = aDP1.Wall
         self.startTime = startTime
+        self.monteCarloFlag = monteCarloFlag
+        self.monteCarloAverageFireMap = monteCarloAverageFireMap
 
     def heuristic_cost_estimate(self, n1, n2):
         return 0
 
     def distance_between(self, n1, n2):
-        # -log(Pr(till n2 is safe | till n1 is safe))
-        pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
-        t = len(pathToN1) - 1 + self.startTime # not the best way, can store this t in the node
-        safeProb = self.pe.evaluate_segment(t,n1,n2)
-        # assert safeProb != 0, "safeProb is 0! "
-        if safeProb == 0:
-            return float('inf')
-        return -math.log(safeProb)
+        if self.monteCarloFlag == 1 and self.STPFlag == 1:
+            # -log(Pr(till n2 is safe | till n1 is safe))
+            pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
+            t = len(pathToN1) - 1 + self.startTime # not the best way, can store this t in the node
+            safeProb = self.pe.evaluate_segment(t,n1,n2)
+            # assert safeProb != 0, "safeProb is 0! "
+            if safeProb == 0:
+                return float('inf')
+            return -math.log(safeProb)
+        else: # using Bayes updated safeProbs, and use MK prob.
+            pathToN1 = list(self.reconstruct_path(self.searchNodes[n1], False))
+            t = len(pathToN1) - 1 + self.startTime # not the best way, can store this t in the node
+            safeProb = self.monteCarloAverageFireMap[t][n2[0]][n2[1]]
+            if safeProb == 0:
+                return float('inf')
+            return -math.log(safeProb)
 
     def neighbors(self, node):
         x, y = node
