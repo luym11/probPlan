@@ -8,6 +8,7 @@ class PathEvaluation(object):
     def __init__(self, monteCarloFireMap, observeTime=0, observeFireState=None,x=0,y=0):
         self.monteCarloHorizon = len(monteCarloFireMap)
         self.monteCarloFireMap = monteCarloFireMap
+        self.casesThatworked = []
 
         # observation will disable many samples
         if x==-1 and (not observeFireState is None): # the case where we observe all the map
@@ -122,6 +123,7 @@ class PathEvaluation(object):
         for h in range(self.monteCarloHorizon): # every episode
             if(self.is_path_safe_in_episode_t(path, self.monteCarloFireMap[h], _T)):
                 positiveCounter += 1
+                self.casesThatworked.append(h)
         if self.monteCarloHorizon == 0:
             safeProb = 0
         else:
