@@ -7,7 +7,7 @@ import path_evaluation
 
 class AutomatonDP:
 
-    def __init__(self, M, N, T, Map, averageFireMap, FireMap, StartPoint, EndPoint, Target, Wall, Fire, Q=4, N_control=5,_observeTime=0, _observeFireState=None, _observeX=0,_observeY=0):
+    def __init__(self, M, N, T, Map, averageFireMap, FireMap, StartPoint, EndPoint, Target, Wall, Fire, Q=4, N_control=5,_observeTime=0, _observeFireState=None, _observeX=0,_observeY=0, STPFlag=1):
         self.M = M
         self.N = N
         self.T = T
@@ -46,6 +46,11 @@ class AutomatonDP:
         self.state_mapper = {}
 
         self.pe = path_evaluation.PathEvaluation(self.FireMap, observeTime=_observeTime, observeFireState=_observeFireState, x=_observeX, y=_observeY)
+
+        # STP related 
+        self.STPFlag = STPFlag
+        self.STP = np.zeros((self.T, self.M, self.N, self.M,self.N)) # This is the STP
+        self.updatedAverageFireMap = averageFireMap # This is the MK prob
     def dfs(self, state, k):
         ################
         # do dfs from the initial state to generate all possible states at time k
@@ -70,31 +75,36 @@ class AutomatonDP:
             if flag != 1:
                 #P_k[index][index] = 1-pr*(Nr+Dr/np.sqrt(2))
                 for nei in neighbors:
+                    indexNei = self.state_mapper.get(nei)
                     if state[0] == nei[0] and state[1] == nei[1]:
                         # nothing
-                        self.P_k[index][self.state_mapper.get(nei)] = 1-self.pr*(Nr+Dr/np.sqrt(2))
+                        self.P_k[index][indexNei] = 1-self.pr*(Nr+Dr/np.sqrt(2))
                     elif state[0] == nei[0] or state[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr
+                        self.P_k[index][indexNei] = self.pr
                     else:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr/np.sqrt(2)
+                        self.P_k[index][indexNei] = self.pr/np.sqrt(2)
                     if not nei in self.visited:
                         self.dfs(nei, k)
             else:
                 #P_k[index][index] = 1-pr*(Nr+Dr/np.sqrt(2))
                 for nei in neighbors:
+                    indexNei = self.state_mapper.get(nei)
                     if(k >= self.T-1):
                         probToFireAtNeighborState = 1
                     else:
-                        # probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
-                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
+                        if (self.STPFlag == 0):
+                            probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
+                        else:
+                            probToFireAtNeighborState = 1 - self.pe.evaluate_segment(k,[state[0],state[1]],[nei[0],nei[1]])
+                            self.STP[k,state[1],state[2],nei[1],nei[2]] = probToFireAtNeighborState
                     if state[0] == nei[0] and state[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
                     elif state[0] == nei[0] or state[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = self.pr * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + self.pr * probToFireAtNeighborState
                     else:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr/np.sqrt(2) * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = self.pr/np.sqrt(2) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + self.pr/np.sqrt(2) * probToFireAtNeighborState
                     if not nei in self.visited:
                         self.dfs(nei, k)
@@ -221,30 +231,35 @@ class AutomatonDP:
             neighbors, Dr, Nr, flag = self.generate_neighbors(state_, k) # returns a set of tuples and 2 numbers
             if flag != 1:
                 for nei in neighbors:
+                    indexNei = self.state_mapper.get(nei)
                     if state_[0] == nei[0] and state_[1] == nei[1]:
                         # nothing
-                        self.P_k[index][self.state_mapper.get(nei)] = 1-self.pr*(Nr+Dr/np.sqrt(2))
+                        self.P_k[index][indexNei] = 1-self.pr*(Nr+Dr/np.sqrt(2))
                     elif state_[0] == nei[0] or state_[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr
+                        self.P_k[index][indexNei] = self.pr
                     else:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr/np.sqrt(2)
+                        self.P_k[index][indexNei] = self.pr/np.sqrt(2)
                     if not nei in self.visited:
                         self.dfs2(nei, k, u)
             else:
                 for nei in neighbors:
+                    indexNei = self.state_mapper.get(nei)
                     if(k >= self.T-1):
                         probToFireAtNeighborState = 1
                     else:
-                        # probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
-                        probToFireAtNeighborState = 1-self.pe.evaluate_segment(k,[state_[0],state_[1]],[nei[0],nei[1]])
+                        if self.STPFlag == 0:
+                            probToFireAtNeighborState = self.averageFireMap[k+1][nei[0]][nei[1]]
+                        else:
+                            probToFireAtNeighborState = 1 - self.pe.evaluate_segment(k,[state_[0],state_[1]],[nei[0],nei[1]])
+                            self.STP[k,state[1],state[2],nei[1],nei[2]] = probToFireAtNeighborState
                     if state_[0] == nei[0] and state_[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = (1-self.pr*(Nr+Dr/np.sqrt(2))) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + (1-self.pr*(Nr+Dr/np.sqrt(2))) * probToFireAtNeighborState
                     elif state_[0] == nei[0] or state_[1] == nei[1]:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = self.pr * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + self.pr * probToFireAtNeighborState
                     else:
-                        self.P_k[index][self.state_mapper.get(nei)] = self.pr/np.sqrt(2) * (1-probToFireAtNeighborState)
+                        self.P_k[index][indexNei] = self.pr/np.sqrt(2) * (1-probToFireAtNeighborState)
                         self.P_k[index][3] = self.P_k[index][3] + self.pr/np.sqrt(2) * probToFireAtNeighborState
                     if not nei in self.visited:
                         self.dfs2(nei, k, u)            
