@@ -5,40 +5,13 @@ _COST_INF = 49
 
 class PathEvaluation(object):
 
-    def __init__(self, monteCarloFireMap, observeTime=0, observeFireState=None,x=0,y=0):
+    def __init__(self, monteCarloFireMap,xT=0,yT=0):
         self.monteCarloHorizon = len(monteCarloFireMap)
         self.monteCarloFireMap = monteCarloFireMap
         self.casesThatworked = []
-
-        # observation will disable many samples
-        if x==-1 and (not observeFireState is None): # the case where we observe all the map
-            deleteList = []
-            # remove some monteCarloFireMaps
-            for i in range(self.monteCarloHorizon):
-                currentEpisodeMapArray = np.array(self.monteCarloFireMap[i][observeTime])
-                currentEpisodeFireState = currentEpisodeMapArray
-                if not np.array_equal(observeFireState, currentEpisodeFireState):
-                    deleteList.append(i)
-            for index in sorted(deleteList, reverse=True):
-                del self.monteCarloFireMap[index]
-            self.monteCarloHorizon = len(self.monteCarloFireMap)
-            print('new monteCarloHorizon is {}'.format(self.monteCarloHorizon))
-        elif not observeFireState is None: 
-            locationArray = np.array([[x+i,y+j] for i in range(-1,2) for j in range(-1,2)])
-            rows=locationArray[:,0]
-            cols=locationArray[:,1]
-            deleteList = []
-            # remove some monteCarloFireMaps
-            for i in range(self.monteCarloHorizon):
-                currentEpisodeMapArray = np.array(self.monteCarloFireMap[i][observeTime])
-                currentEpisodeFireState = currentEpisodeMapArray[rows,cols]
-                if not np.array_equal(observeFireState, currentEpisodeFireState):
-                    deleteList.append(i)
-            for index in sorted(deleteList, reverse=True):
-                del self.monteCarloFireMap[index]
-            self.monteCarloHorizon = len(self.monteCarloFireMap)
-            print('new monteCarloHorizon is {}'.format(self.monteCarloHorizon))
-        #self.monteCarloFireMapArray = np.array(monteCarloFireMap)
+        self.obsvEffectRange = 2
+        self.xT=xT
+        self.yT=yT
 
     def evaluate_path(self, path):
         # note this path must be from initial point. For Monte Carlo methods, the best way is
@@ -109,6 +82,39 @@ class PathEvaluation(object):
         else:
             safeProb = positiveCounter/totalCounter
         return safeProb
+
+
+    def evaluate_segment_obsv(self, t1, p1, t2, p2, t_obsv, fireLocationArray):
+        # given p1 at t1 safe, how safe is p2 at t2. All MC samples used to evaluate this safe probability has to correspond to observation at t_obsv with fireLocationArray
+        positiveCounter = 0
+        totalCounter = 0
+        correspondCounter = 0
+        for h in range(self.monteCarloHorizon): # every episode
+            if (self.CurrentMCSampleCorrespondsObsv(t_obsv, fireLocationArray, self.monteCarloFireMap[h])): 
+                correspondCounter += 1
+                if (self.is_path_safe_at_t(p1, self.monteCarloFireMap[h][t1])):
+                    totalCounter += 1
+                    if(self.is_path_safe_at_t(p2, self.monteCarloFireMap[h][t2])):
+                        positiveCounter += 1
+        if totalCounter == 0:
+            safeProb = 0
+        else:
+            safeProb = positiveCounter/totalCounter
+        # print('Corresponding episode number: {0}'.format(correspondCounter))
+        # print('safeProb from {0} to {1} is {2}'.format(p1,p2,safeProb))
+        return safeProb
+
+    def CurrentMCSampleCorrespondsObsv(self, t_obsv, fireLocationArray, currentEpisode):
+        # returns a boolean value indicating if firelocationArray corresponds to currentEpisode[t_obsv], meaning them having same fire status at same locations
+        fireMapAtObsv = currentEpisode[t_obsv]
+        fireLocationArrayFullAtCurrentEpisode = np.array([[self.xT+i,self.yT+j] for i in range(-self.obsvEffectRange,self.obsvEffectRange+1) for j in range(-self.obsvEffectRange,self.obsvEffectRange+1) if fireMapAtObsv[self.xT+i,self.yT+j] == 1])
+        if (fireLocationArrayFullAtCurrentEpisode.size == 0):
+            fireLocationArrayFullAtCurrentEpisode = None
+            return fireLocationArray is None
+        else:
+            fireLocationArrayFullAtCurrentEpisodeList = fireLocationArrayFullAtCurrentEpisode.tolist()
+            fireLocationArrayList = fireLocationArray.tolist()
+            return all(elem in fireLocationArrayFullAtCurrentEpisodeList for elem in fireLocationArrayList) #and all(elem in fireLocationArrayList for elem in fireLocationArrayFullAtCurrentEpisodeList)
 
     def is_segment_safe_in_episode(self, p1, p2, t, episodeFireMap):
         if episodeFireMap[t+1][p2[0]][p2[1]] > 0.9:

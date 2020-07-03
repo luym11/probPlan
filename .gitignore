@@ -60,3 +60,7 @@ MCFS_cur
 *.sh
 
 foot.py
+
+MC*
+d-star-lite/*
+.ipynb_checkpoints/*
