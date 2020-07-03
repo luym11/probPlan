@@ -9,16 +9,17 @@ from maxProbAstar import MaxProbAstar
 from path_evaluation import PathEvaluation
 import pickle
 import imageio
+import os, shutil
 
-# # save stuff as pickle
-with open('MCFMs3000', 'wb') as fp:
-    pickle.dump(monteCarloFireMap, fp)
-with open('MCAFMs3000', 'wb') as fp:
-    pickle.dump(monteCarloAverageFireMap, fp)
+# # # save stuff as pickle
+# with open('MCFMs3000', 'wb') as fp:
+#     pickle.dump(monteCarloFireMap, fp)
+# with open('MCAFMs3000', 'wb') as fp:
+#     pickle.dump(monteCarloAverageFireMap, fp)
 
 # load stuff with pickle
-monteCarloFireMap = pickle.load(open('MCFMs', "rb"))
-monteCarloAverageFireMap = pickle.load(open('MCAFMs', "rb"))
+monteCarloFireMap = pickle.load(open('MCFMs3000', "rb"))
+monteCarloAverageFireMap = pickle.load(open('MCAFMs3000', "rb"))
 
 # firemap = monteCarloFireMap[s][10]
 # # firemap=monteCarloAverageFireMap[10]
@@ -32,9 +33,9 @@ monteCarloAverageFireMap = pickle.load(open('MCAFMs', "rb"))
 
 # let's do a sample
 s = 8
-T=10
-x = 7
-y = 9
+T=16
+x = 14
+y = 14
 currentRunMap = monteCarloFireMap[s][T] # at s th trial, T
 locationArray = np.array([[x+i,y+j] for i in range(-1,2) for j in range(-1,2)])
 rows=locationArray[:,0]
@@ -43,8 +44,8 @@ currentRunMapArray = np.array(currentRunMap)
 currentFireState = currentRunMapArray[rows,cols]
 # currentFireState = np.array([1,0,0,0,0,0,0,0,0])
 # compute covering function but only include samples consistent with our observation
-# now we use 30000
-_GenerateHorizon = 30000
+# now we use 3000
+_GenerateHorizon = 3000
 firemap_sum = np.zeros([50,20,20], dtype=np.float32)
 sampleCounter = 0
 for h in range(_GenerateHorizon): # for all samples
@@ -88,11 +89,17 @@ ax = sns.heatmap(subtractedMatrix, annot=True, fmt='.2f', vmin=-1, vmax=1)
 plt.ylim(reversed(plt.ylim()))
 plt.show()
 
+# clear folder
+for filename in os.scandir('figs'):
+    filePath = os.path.join('figs', filename)
+    os.unlink(filePath)
+
 # anime plots
 images = []
 for tt in range(10,50):
     fig = plt.figure()
-    subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
+    subtractedMap = monteCarloAverageFireMap[tt]
+    # subtractedMap = np.subtract(monteCarloAverageFireMap[tt], firemap_sum[tt])
     subtractedMatrix = np.transpose(subtractedMap)
     ax = sns.heatmap(subtractedMatrix, annot=False,vmin=-1, vmax=1)
     plt.ylim(reversed(plt.ylim()))

@@ -45,7 +45,7 @@ class AutomatonDP:
         self.P_k = [[0 for col in range(self.N_state)] for row in range(self.N_state)]
         self.state_mapper = {}
 
-        self.pe = path_evaluation.PathEvaluation(self.FireMap, observeTime=_observeTime, observeFireState=_observeFireState, x=_observeX, y=_observeY)
+        self.pe = path_evaluation.PathEvaluation(self.FireMap)
 
         # STP related 
         self.STPFlag = STPFlag
