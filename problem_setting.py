@@ -172,38 +172,57 @@ class ProblemSetting():
             np.savetxt('./monteCarloAverage/monteCarloAverageFireMap'+str(k)+'.txt', firemap_sum[k])
         return firemap_sum
 
-    def compute_monteCarlo_2(self, _GenerateHorizon):
+    def compute_monteCarlo_2(self, _GenerateHorizon, pickleSave=True):
         # Do as compute_monteCarlo and save
         # Time horizon fixed to be len(self.FireMap)
         monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
         monteCarloAverageFireMap = np.array(np.copy(self.FireMap), dtype=np.float32)
         for h in range(_GenerateHorizon):
-            print('started {} MC simulation'.format(h+1))
+            # print('started {} MC simulation'.format(h+1))
             new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
             for k in range(len(self.FireMap)):
                 monteCarloFireMap[h][k] =  new_firemap[k]
                 monteCarloAverageFireMap[k] = np.add(monteCarloAverageFireMap[k], new_firemap[k])
         for k in range(len(self.FireMap)):
-            print('started {} averaging'.format(k+1))
+            # print('started {} averaging'.format(k+1))
             monteCarloAverageFireMap[k] = np.divide(monteCarloAverageFireMap[k], _GenerateHorizon)
         # pickle save
-        with open('MCFMs'+str(_GenerateHorizon), 'wb') as fp:
-            pickle.dump(monteCarloFireMap, fp)
-        with open('MCAFMs'+str(_GenerateHorizon), 'wb') as fp:
-            pickle.dump(monteCarloAverageFireMap, fp)
+        if (pickleSave == True):
+            with open('MCFMs'+str(_GenerateHorizon), 'wb') as fp:
+                pickle.dump(monteCarloFireMap, fp)
+            with open('MCAFMs'+str(_GenerateHorizon), 'wb') as fp:
+                pickle.dump(monteCarloAverageFireMap, fp)
         return monteCarloAverageFireMap, monteCarloFireMap
 
-    def compute_monteCarlo_3(self, _GenerateHorizon, startTime):
-        # Do as compute_monteCarlo but not saving
-        # Time horizon start from startTime (specify when calling the function) to len(self.FireMap)
-        # Also generate horizon is specified when calling
-        monteCarloFireMap = [[[] for k in range(len(self.FireMap) - startTime)] for h in range(_GenerateHorizon)]
-        for h in range(_GenerateHorizon):
-            print('started {} MC simulation for NEW OBSERVATION'.format(h+1))
-            new_firemap = np.asarray(self.mapGenerator(self.T-startTime), dtype=np.float32)
-            for k in range(len(self.FireMap) - startTime):
-                monteCarloFireMap[h][k] =  new_firemap[k]
-        return monteCarloFireMap
+    def compute_monteCarlo_obsv(self, _GenerateHorizon, pickleSave=True, fireLocationArray=None, obsvTime=0,fileName='0'):
+            # Do as compute_monteCarlo and save
+            # Time horizon fixed to be len(self.FireMap)
+            monteCarloFireMap = [[[] for k in range(len(self.FireMap))] for h in range(_GenerateHorizon)]
+            monteCarloAverageFireMap = np.array(np.copy(self.FireMap), dtype=np.float32)
+            counter = 0
+            h = 0
+            while h < _GenerateHorizon:
+                counter += 1
+                # print('started {} MC simulation'.format(h+1))
+                new_firemap = np.asarray(self.mapGenerator(self.T), dtype=np.float32)
+                if min([ new_firemap[obsvTime][fireLocation[0]][fireLocation[1]] for fireLocation in fireLocationArray]) < 0.9:
+                    continue
+                for k in range(len(self.FireMap)):
+                    monteCarloFireMap[h][k] =  new_firemap[k]
+                    monteCarloAverageFireMap[k] = np.add(monteCarloAverageFireMap[k], new_firemap[k])
+                h += 1
+            print('counter is {0}'.format(counter))
+            print('h is {0}'.format(h))
+            for k in range(len(self.FireMap)):
+                # print('started {} averaging'.format(k+1))
+                monteCarloAverageFireMap[k] = np.divide(monteCarloAverageFireMap[k], _GenerateHorizon)
+            # pickle save
+            if (pickleSave == True):
+                with open('MCFMsObsv'+str(_GenerateHorizon)+'Loc'+fileName, 'wb') as fp:
+                    pickle.dump(monteCarloFireMap, fp)
+                with open('MCAFMsObsv'+str(_GenerateHorizon)+'Loc'+fileName, 'wb') as fp:
+                    pickle.dump(monteCarloAverageFireMap, fp)
+            return monteCarloAverageFireMap, monteCarloFireMap
 
     def __init__(self, target = [[18,16]], startPoint = [[8,0]], fire=[[9,12], [3,6]], endPoint = [[19,12]],_stochastic_environment_flag=1, _setting_num=1):
         self.stochastic_environment_flag = _stochastic_environment_flag
@@ -265,16 +284,16 @@ class ProblemSetting():
         self.monteCarloHorizon = 0 # anyway will be changed in compute_monteCarlo function
 
         if(_setting_num == 0):
-            self.M = 4
-            self.N = 4
+            self.M = 2
+            self.N = 2
             self.T = 20
             # read in the (initial)map for map value checking
             # do notice the difference between this and the Matlab code (1 smaller in indices as py starts from 0)
             self.StartPoint = [[0,0]]
-            self.EndPoint = [[3,3]]
-            self.Target = [[1,2]]
+            self.EndPoint = [[1,1]]
+            self.Target = [[1,0]]
             self.Wall = []
-            self.Fire = [[1,3],[3,2],[2,3],[2,1],[0,0]]
+            self.Fire = [[1,0]]
         # Generate static Map and fire map list FireMap
         self.Map = self.mapCreator()
         self.FireMap = self.mapGenerator(self.T)

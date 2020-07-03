@@ -16,13 +16,15 @@ _SIZE = 20
 # use 300 samples for fast computation
 
 # load stuff with pickle
-monteCarloFireMap = pickle.load(open('MCFMs300', "rb"))
-monteCarloAverageFireMap = pickle.load(open('MCAFMs300', "rb"))
+monteCarloFireMap = pickle.load(open('MCFMs3000', "rb"))
+monteCarloAverageFireMap = pickle.load(open('MCAFMs3000', "rb"))
 
 # problem setup
-x = 8
-y = 16
-p1 = problem_setting.ProblemSetting(target = [[x,y]],_stochastic_environment_flag=1, _setting_num=1)
+xTar = 8
+yTar = 16
+xEnd=11
+yEnd=19
+p1 = problem_setting.ProblemSetting(target = [[xTar,yTar]], endPoint = [[xEnd,yEnd]],_stochastic_environment_flag=1, _setting_num=1)
 
 
 aDP1 = automaton_dp.AutomatonDP(p1.M,p1.N,p1.T,p1.Map,monteCarloAverageFireMap, monteCarloFireMap, p1.StartPoint,p1.EndPoint,p1.Target,p1.Wall,p1.Fire,Q=4)
