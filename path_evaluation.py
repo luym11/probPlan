@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from multiprocessing import Pool
 _PROB_INF = 10000
 _COST_INF = 49
 
@@ -86,23 +87,41 @@ class PathEvaluation(object):
 
     def evaluate_segment_obsv(self, t1, p1, t2, p2, t_obsv, fireLocationArray):
         # given p1 at t1 safe, how safe is p2 at t2. All MC samples used to evaluate this safe probability has to correspond to observation at t_obsv with fireLocationArray
+        self.t_obsv = t_obsv
+        self.fireLocationArray = fireLocationArray 
+        self.p1 = p1
+        self.p2 = p2
+        self.t1 = t1
+        self.t2 = t2
+        return self._parallel_mc()
+
+    def _parallel_mc(self):
+        pool = Pool(4)
+        result_objects_pc = pool.map_async(self._once_mc_pos, self.monteCarloFireMap).get()
+        pool.close()
+        pool2 = Pool(4)
+        result_objects_tc = pool2.map_async(self._once_mc_total, self.monteCarloFireMap).get()
+        pool2.close()
+        # pc = pool.map(self._once_mc_pos, self.monteCarloFireMap)
+        # tc = pool.map(self._once_mc_total, self.monteCarloFireMap)
+        return sum(result_objects_pc)/sum(result_objects_tc)
+
+    def _once_mc_pos(self, oneFireMapEpisode):
         positiveCounter = 0
         totalCounter = 0
-        correspondCounter = 0
-        for h in range(self.monteCarloHorizon): # every episode
-            if (self.CurrentMCSampleCorrespondsObsv(t_obsv, fireLocationArray, self.monteCarloFireMap[h])): 
-                correspondCounter += 1
-                if (self.is_path_safe_at_t(p1, self.monteCarloFireMap[h][t1])):
-                    totalCounter += 1
-                    if(self.is_path_safe_at_t(p2, self.monteCarloFireMap[h][t2])):
-                        positiveCounter += 1
-        if totalCounter == 0:
-            safeProb = 0
-        else:
-            safeProb = positiveCounter/totalCounter
-        # print('Corresponding episode number: {0}'.format(correspondCounter))
-        # print('safeProb from {0} to {1} is {2}'.format(p1,p2,safeProb))
-        return safeProb
+        if (self.CurrentMCSampleCorrespondsObsv(self.t_obsv, self.fireLocationArray, oneFireMapEpisode)): 
+            if (self.is_path_safe_at_t(self.p1, oneFireMapEpisode[self.t1])):
+                totalCounter = 1
+                if(self.is_path_safe_at_t(self.p2, oneFireMapEpisode[self.t2])):
+                    positiveCounter = 1
+        return positiveCounter
+
+    def _once_mc_total(self, oneFireMapEpisode):
+        totalCounter = 0
+        if (self.CurrentMCSampleCorrespondsObsv(self.t_obsv, self.fireLocationArray, oneFireMapEpisode)): 
+            if (self.is_path_safe_at_t(self.p1, oneFireMapEpisode[self.t1])):
+                totalCounter = 1
+        return totalCounter
 
     def CurrentMCSampleCorrespondsObsv(self, t_obsv, fireLocationArray, currentEpisode):
         # returns a boolean value indicating if firelocationArray corresponds to currentEpisode[t_obsv], meaning them having same fire status at same locations
