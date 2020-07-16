@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from multiprocessing import Pool
+import time
 _PROB_INF = 10000
 _COST_INF = 49
 
@@ -93,20 +94,14 @@ class PathEvaluation(object):
         self.p2 = p2
         self.t1 = t1
         self.t2 = t2
-        return self._parallel_mc()
+        return self._map_mc()
 
-    def _parallel_mc(self):
-        pool = Pool(4)
-        result_objects_pc = pool.map_async(self._once_mc_pos, self.monteCarloFireMap).get()
-        pool.close()
-        pool2 = Pool(4)
-        result_objects_tc = pool2.map_async(self._once_mc_total, self.monteCarloFireMap).get()
-        pool2.close()
-        # pc = pool.map(self._once_mc_pos, self.monteCarloFireMap)
-        # tc = pool.map(self._once_mc_total, self.monteCarloFireMap)
-        return sum(result_objects_pc)/sum(result_objects_tc)
+    def _map_mc(self):
+        result_objects = map(self._once_mc, self.monteCarloFireMap)
+        result_array = np.array(list(result_objects))
+        return sum(result_array[:,0])/sum(result_array[:,1])
 
-    def _once_mc_pos(self, oneFireMapEpisode):
+    def _once_mc(self, oneFireMapEpisode):
         positiveCounter = 0
         totalCounter = 0
         if (self.CurrentMCSampleCorrespondsObsv(self.t_obsv, self.fireLocationArray, oneFireMapEpisode)): 
@@ -114,14 +109,8 @@ class PathEvaluation(object):
                 totalCounter = 1
                 if(self.is_path_safe_at_t(self.p2, oneFireMapEpisode[self.t2])):
                     positiveCounter = 1
-        return positiveCounter
+        return np.array([positiveCounter, totalCounter])
 
-    def _once_mc_total(self, oneFireMapEpisode):
-        totalCounter = 0
-        if (self.CurrentMCSampleCorrespondsObsv(self.t_obsv, self.fireLocationArray, oneFireMapEpisode)): 
-            if (self.is_path_safe_at_t(self.p1, oneFireMapEpisode[self.t1])):
-                totalCounter = 1
-        return totalCounter
 
     def CurrentMCSampleCorrespondsObsv(self, t_obsv, fireLocationArray, currentEpisode):
         # returns a boolean value indicating if firelocationArray corresponds to currentEpisode[t_obsv], meaning them having same fire status at same locations
