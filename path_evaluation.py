@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from multiprocessing import Pool
+from multiprocessing import Process
 import time
 _PROB_INF = 10000
 _COST_INF = 49
@@ -97,11 +97,20 @@ class PathEvaluation(object):
         return self._map_mc()
 
     def _map_mc(self):
-        result_objects = map(self._once_mc, self.monteCarloFireMap)
-        result_array = np.array(list(result_objects))
+        jobs = []
+        outlist = list()
+        for _ in range(4):
+            process = Process(target=self._once_mc, args=(self.monteCarloFireMap, outlist))
+            jobs.append(process)
+        for j in jobs:
+            j.start()
+        for j in jobs:
+            j.join()
+        # result_objects = map(self._once_mc, self.monteCarloFireMap)
+        result_array = np.array(outlist)
         return sum(result_array[:,0])/sum(result_array[:,1])
 
-    def _once_mc(self, oneFireMapEpisode):
+    def _once_mc(self, oneFireMapEpisode, outlist):
         positiveCounter = 0
         totalCounter = 0
         if (self.CurrentMCSampleCorrespondsObsv(self.t_obsv, self.fireLocationArray, oneFireMapEpisode)): 
@@ -109,7 +118,8 @@ class PathEvaluation(object):
                 totalCounter = 1
                 if(self.is_path_safe_at_t(self.p2, oneFireMapEpisode[self.t2])):
                     positiveCounter = 1
-        return np.array([positiveCounter, totalCounter])
+        outlist.append(np.array([positiveCounter, totalCounter]))
+        # return np.array([positiveCounter, totalCounter])
 
 
     def CurrentMCSampleCorrespondsObsv(self, t_obsv, fireLocationArray, currentEpisode):
