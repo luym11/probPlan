@@ -57,3 +57,9 @@ Only solve the problem using DP method.
 ### maxProbAstar.py
 
 Solve the problem using A*(h=0) with path evaluation as "cost"
+
+## Related papers
+- [Safe mission planning under dynamical uncertainties (ICRA 2020)](https://arxiv.org/abs/2003.02913/)
+[ICRA 2020 talk for this paper](https://www.dropbox.com/s/4f1jqbmpypaj72z/icra202020.mp4?dl=0/)
+
+- Real-time safe path planning via incorporating local observations of dynamic uncertainties (in prep.)
