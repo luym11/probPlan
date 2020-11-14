@@ -20,4 +20,4 @@ We illustrate our solution in the following picture.
 
 - Real-time safe path planning via incorporating local observations of dynamic uncertainties (in prep.)
 
-- Multi-robot task allocation for safe planning under dynamic uncertainties (in prep.)
+- Multi-robot task allocation for safe planning under dynamic uncertainties (co-advised master's thesis [in prep.])
