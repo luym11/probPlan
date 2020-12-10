@@ -14,6 +14,7 @@ class PathEvaluation(object):
         self.obsvEffectRange = 2
         self.xT=xT
         self.yT=yT
+        self.savedSafeProb = np.ones([50,20,20,20,20]) * -1
 
     def evaluate_path(self, path):
         # note this path must be from initial point. For Monte Carlo methods, the best way is
@@ -88,13 +89,18 @@ class PathEvaluation(object):
 
     def evaluate_segment_obsv(self, t1, p1, t2, p2, t_obsv, fireLocationArray):
         # given p1 at t1 safe, how safe is p2 at t2. All MC samples used to evaluate this safe probability has to correspond to observation at t_obsv with fireLocationArray
-        self.t_obsv = t_obsv
-        self.fireLocationArray = fireLocationArray 
-        self.p1 = p1
-        self.p2 = p2
-        self.t1 = t1
-        self.t2 = t2
-        return self._map_mc()
+        if self.savedSafeProb[t1,p1[0],p1[1],p2[0],p2[1]] != -1:
+            safeProb = self.savedSafeProb[t1,p1[0],p1[1],p2[0],p2[1]] 
+        else:
+            self.t_obsv = t_obsv
+            self.fireLocationArray = fireLocationArray 
+            self.p1 = p1
+            self.p2 = p2
+            self.t1 = t1
+            self.t2 = t2
+            safeProb = self._map_mc()
+            self.savedSafeProb[t1,p1[0],p1[1],p2[0],p2[1]] = safeProb
+        return safeProb
 
     def _map_mc(self):
         jobs = []

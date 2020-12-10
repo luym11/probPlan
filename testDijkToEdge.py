@@ -97,11 +97,16 @@ class UpdateEnv():
         self.dijkPathFinder = MaxProbAstar(self.M,self.N,self.Wall,self.fireMap,startTime = self.T,xT=self.xT,yT=self.yT, observedFireLocationArray = self.observedFireLocationArray, searchSize = edgeSize)
         for loc2 in self.allEdge:
             try:
+                _t = time.time()
                 _pathSegment, searchNodes, lastNode = self.dijkPathFinder.astar(tuple([self.xT,self.yT]),tuple(loc2))
+                elapsed_ = time.time() - _t
+                print('Dijk took: %f seconds' %(elapsed_))
                 pathSegment = list(_pathSegment)
                 # safeProbSegmentList = [1-aDP1.updatedAverageFireMap[self.T+1+ind][x][y] for ind,(x,y) in enumerate(pathSegment[1:])]
                 safeProbSegmentList = [self.pe.evaluate_segment_obsv(self.T+ind,[pathSegment[ind][0],pathSegment[ind][1]],self.T+ind+1,[pathSegment[ind+1][0],pathSegment[ind+1][1]],self.T,self.observedFireLocationArray) for ind,(x,y) in enumerate(pathSegment[:-1])]
                 safeProbSegment = functools.reduce(lambda a,b:a*b, safeProbSegmentList)
+                elapsed_2 = time.time() - _t
+                print('Eval took: %f seconds' %(elapsed_2))
                 assert safeProbSegment > 0, "safeProbSegment is LE to 0! "
                 if safeProbSegment <= 0:
                     minusLogSafeProbSegment = float('inf')
@@ -127,9 +132,12 @@ class UpdateEnv():
             routesFromNowCopied = copy.deepcopy(routesFromNow)
             self.remove_duplicated_path_segs(routesFromNowCopied)
             try:
+                _t = time.time()
                 # updated safe probability for part 2
                 safeProbSegmentList2 = [self.pe.evaluate_segment_obsv(self.T+possibleLength[i]-1+ind,[routesFromNow[ind][0],routesFromNow[ind][1]],self.T+possibleLength[i]-1+ind+1,[routesFromNow[ind+1][0],routesFromNow[ind+1][1]],self.T,self.observedFireLocationArray) for ind,(x,y,q) in enumerate(routesFromNowCopied[:-1])]
                 safeProbSegment2 = functools.reduce(lambda a,b:a*b, safeProbSegmentList2)
+                elapsed_3 = time.time() - _t
+                print('EvalOld took: %f seconds' %(elapsed_3))
                 assert safeProbSegment2 > 0, "safeProbSegment is LE to 0! "
                 if safeProbSegment2 <= 0:
                     minusLogSafeProbSegment2 = float('inf')
