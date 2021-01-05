@@ -41,6 +41,6 @@ The main functioning parts of the code is implemented in an OOP (Object-orienate
 
 [ICRA 2020 talk for this paper](https://www.dropbox.com/s/4f1jqbmpypaj72z/icra202020.mp4?dl=0/)
 
-- Real-time safe path planning via incorporating local observations of dynamic uncertainties (in prep.)[current draft](https://www.dropbox.com/s/leje4dt329gjcml/draft_online.pdf?dl=0)
+- Real-time safe path planning via incorporating local observations of dynamic uncertainties (in prep.)
 
 - Multi-robot task allocation for safe planning under dynamic uncertainties (co-advised master's thesis [in prep.])
