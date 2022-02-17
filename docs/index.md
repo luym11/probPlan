@@ -1,4 +1,6 @@
-## Welcome to GitHub Pages
+## Welcome to probPlan
+
+Everything below needs to be modified! 
 
 You can use the [editor on GitHub](https://github.com/luym11/probPlan/edit/online/partial_replan_optimize/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
