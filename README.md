@@ -43,4 +43,4 @@ The main functioning parts of the code is implemented in an OOP (Object-orienate
 
 - Real-time safe path planning via incorporating local observations of dynamic uncertainties (in prep.)
 
-- Multi-robot task allocation for safe planning under dynamic uncertainties (co-advised master's thesis submitted ([arXiv](https://arxiv.org/abs/2103.01840))
+- Multi-robot task allocation for safe planning under dynamic uncertainties (co-advised master's thesis that appears in ECC 2023 ([arXiv](https://arxiv.org/abs/2103.01840))
